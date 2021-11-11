@@ -1,0 +1,47 @@
+.container {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  background-color: #F8F8F8;
+}
+.containerSection {
+  width: 100%;
+  height: 40px;
+  background-color: #2F4EB4;
+}
+.dropdownSection {
+  width: 100%;
+  max-width: 400px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.turnButton {
+  height: 40px;
+  align-self: flex-end;
+  margin-bottom: -20px;
+  margin-top: -20px;
+  z-index: 100;
+  width: 40px;
+  right: 10;
+  border-radius: 20px;
+  text-align: center;
+}
+.calenderSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 300px;
+}
+.flex {
+  display: flex;
+  flex-direction: column;
+}
+.widthFixed {
+  max-width: 300px;
+  font-size: 22;
+}

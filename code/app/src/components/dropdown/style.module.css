@@ -1,0 +1,8 @@
+.dropDownHolder {
+  background-color: white;
+  width: 100%;
+  margin-bottom: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+};
