@@ -1,0 +1,54 @@
+.detailHolder {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  background-color: #F8F8F8;
+}
+.detailSubholder {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  color: white;
+  background-color: #2F4EB4;
+}
+.link {
+  color: white;
+  font-size: 22;
+  position: absolute;
+  left: 20px;
+}
+.listItem {
+  width: 100%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: #2F4EB4;
+}
+.detailHolderMain {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  background-color: #F8F8F8;
+}
+.detailSubHolderMain {
+  width: 100%;
+  color: white;
+  display: flex; 
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 80px;
+  background-color: #2F4EB4;
+}

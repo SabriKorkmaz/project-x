@@ -1,22 +1,35 @@
+//import {observer} from "mobx-react";
+import {Box, Container} from "@material-ui/core";
+import {Logo} from "../../components/logo";
+import {Search} from "../../components/search-bar";
+import SignIn from "../../components/sign-in";
 import React from "react";
-import {observer} from "mobx-react";
-import {IHomeState} from "./interface";
-import {Button, Stack} from "@mui/material";
+import Latest from "../../components/latest";
+import Footer from "../../components/footer";
 
-@observer
-export class Home extends React.Component<{}, IHomeState> {
-    constructor(props: any) {
-        super(props);
-    }
 
-    render() {
-        return (
-            <Stack spacing={2} direction="row">
-                <Button variant="text">Text</Button>
-                <Button variant="contained">Contained</Button>
-                <Button variant="outlined">Outlined</Button>
-            </Stack>
-        );
-    }
 
+//@observer
+export const Home = () => {
+    //const { setSnack } = useContext(SnackbarContext);
+    return (
+            <React.Fragment>
+                <Container maxWidth='xl' style={{paddingTop:"100px"}}>
+                    <Box sx={{display: "flex"}}>
+                        <Box sx={{color: "red", display: 'flex', flex: '10%'}}>
+                            <Logo/>
+                        </Box>
+                        <Box sx={{color: "red", display: 'flex',flexDirection:"column", flex: '50%'}} style={{justifyContent:"center"}}>
+                            <Search/>
+                            <Latest/>
+                        </Box>
+                        <Box sx={{color: "red", display: 'flex', flex: '10%'}}>
+                            <SignIn/>
+                        </Box>
+                    </Box>
+                    <Footer/>
+
+                </Container>
+            </React.Fragment>
+    )
 }

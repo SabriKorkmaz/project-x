@@ -1,27 +1,35 @@
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import {Home} from "./routes/home";
-import Detail from "./routes/detail";
-import {BrowserRouter} from "react-router-dom";
-import {RouteComponentProps} from '@reach/router';
+import {Routes, Route, BrowserRouter} from "react-router-dom";
+import {createTheme} from "@material-ui/core";
+import {ThemeProvider} from "@mui/material";
 
 const App = () => {
-
-    const RouterPage = (
-        props: { pageComponent: JSX.Element } & RouteComponentProps
-    ) => props.pageComponent
-
-
-    return (
-        <div style={{height: "100%", width: "100%"}}>
-            <RouterPage path="/" pageComponent={<Home/>}/>
-            <RouterPage path="/Detail" pageComponent={<Detail/>}/>
-        </div>
-    );
+    return (<Routes>
+        <Route index element={<Home/>}/>
+    </Routes>)
 };
+const theme = createTheme({
+    palette: {
+        type: 'light',
+        primary: {
+            main: '#3f51b5',
+        },
+        secondary: {
+            main: '#f50057',
+        },
+        background: {
+            default: '#e0e0e0',
+            paper: '#ffffff',
+        },
+    },
+});
 ReactDOM.render(
     <BrowserRouter>
-        <App/>
+        <ThemeProvider theme={theme}>
+            <App/>
+        </ThemeProvider>
     </BrowserRouter>,
     document.getElementById("root")
 );
