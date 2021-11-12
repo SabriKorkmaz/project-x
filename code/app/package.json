@@ -24,6 +24,7 @@
     "@types/react-select": "^3.0.14",
     "axios": "^0.24.0",
     "material-ui-search-bar": "^1.0.0",
+    "mobx": "^6.3.7",
     "mobx-react": "^7.2.1",
     "react": "^16.0.0",
     "react-dom": "^16.0.2",
