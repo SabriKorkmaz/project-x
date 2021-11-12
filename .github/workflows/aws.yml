@@ -50,6 +50,7 @@ jobs:
         node-version: [16.x]
     steps:
       - uses: actions/checkout@v1
+      - run: cd code/app
       - run: npm install
       - run: npm run build
   deploy:
