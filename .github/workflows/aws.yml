@@ -51,9 +51,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: ls
-      - run: cd code
+      - run: cd code/
       - run: ls
-      - run: cd app
+      - run: cd app/
       - run: ls
       - run: npm install
       - run: npm run build
