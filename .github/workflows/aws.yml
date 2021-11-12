@@ -51,6 +51,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: cd code/app
+      - run: ls
       - run: npm install
       - run: npm run build
   deploy:
