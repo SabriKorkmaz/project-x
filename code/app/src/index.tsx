@@ -1,15 +1,35 @@
 import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
-import {Home} from "./routes/home";
 import {Routes, Route, BrowserRouter} from "react-router-dom";
 import {createTheme} from "@material-ui/core";
 import {ThemeProvider} from "@mui/material";
+import Latest from "./components/latest";
+import Header from "./components/header";
+import {Search} from "./routes/search";
+import {Recovery} from "./routes/recovery";
 
 const App = () => {
-    return (<Routes>
-        <Route index element={<Home/>}/>
-    </Routes>)
+    return (
+
+        <Header>
+            <Routes>
+                <Route path="/" element={
+                    <Latest/>
+                }/>
+
+                <Route path="/search/:keyword" element={
+                    <Search/>
+                }/>
+
+                <Route path="/recovery" element={
+                    <Recovery/>
+                }/>
+            </Routes>
+        </Header>
+
+    )
 };
+
 const theme = createTheme({
     palette: {
         type: 'light',

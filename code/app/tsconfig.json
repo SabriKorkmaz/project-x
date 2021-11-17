@@ -31,6 +31,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
+
     "noFallthroughCasesInSwitch": true
   },
   "include": [

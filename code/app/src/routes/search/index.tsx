@@ -1,19 +1,17 @@
+
+//import {observer} from "mobx-react";
+import { Box } from "@material-ui/core";
 import React from "react";
+import SearchResult from "../../components/table";
 
-import {observer} from "mobx-react";
-import {Button, Stack} from "@mui/material";
-
-@observer
-class Search extends React.Component {
-    render() {
-        return (
-            <Stack spacing={2} direction="row">
-                <Button variant="text">Text</Button>
-                <Button variant="contained">Contained</Button>
-                <Button variant="outlined">Outlined</Button>
-            </Stack>
-        );
-    }
+//@observer
+export const Search = (props:any) => {
+    //const { setSnack } = useContext(SnackbarContext);
+    return (
+        <React.Fragment>
+            <Box style={{marginTop: "20px"}}>
+                <SearchResult/>
+            </Box>
+        </React.Fragment>
+    )
 }
-
-export default Search
