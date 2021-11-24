@@ -1,10 +1,10 @@
 import {Box, Container} from "@material-ui/core";
 import {Logo} from "../../components/logo";
-import {Search} from "../../components/search-bar";
 /*import Profile from "../../components/auth";*/
 import React from "react";
 import SideBar from "../side-bar";
-export default function Header(props: any, props1: any) {
+
+export default function HeaderWithoutSearch(props: any) {
 
     return (
         <React.Fragment>
@@ -22,11 +22,10 @@ export default function Header(props: any, props1: any) {
                         flex: "70%"
                     }}
                          style={{justifyContent: "start"}}>
-                        <Search/>
                         {props.children}
                     </Box>
-                    <Box sx={{display: 'flex'}} >
-                     {/*   <Profile/>*/}
+                    <Box sx={{display: 'flex'}}>
+                        {/*   <Profile/>*/}
                         <SideBar/>
                     </Box>
                 </Box>

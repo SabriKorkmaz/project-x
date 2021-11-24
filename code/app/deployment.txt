@@ -1,0 +1,13 @@
+//Github
+docker login
+docker build -t project-x-frontend .
+docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
+docker push sbrkrkmz/project-x:project-x-frontend
+
+
+//AWS
+docker login
+docker rm -f $(docker ps -a -q)
+docker rmi $(docker images -a -q)
+docker pull sbrkrkmz/project-x:project-x-frontend
+docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend

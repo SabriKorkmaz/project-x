@@ -2,7 +2,7 @@
 //import {observer} from "mobx-react";
 import { Box } from "@material-ui/core";
 import React from "react";
-import SearchResult from "../../components/table";
+import TableList from "../../components/table";
 
 //@observer
 export const Search = (props:any) => {
@@ -10,8 +10,9 @@ export const Search = (props:any) => {
     return (
         <React.Fragment>
             <Box style={{marginTop: "20px"}}>
-                <SearchResult/>
+                < TableList/>
             </Box>
         </React.Fragment>
     )
 }
+

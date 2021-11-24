@@ -13,9 +13,10 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import BasicModal from "../modal";
 import Register from "../register";
+import {Card} from "@material-ui/core";
 
 
-export default function Profile() {
+export default function Auth() {
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const data = new FormData(event.currentTarget);
@@ -26,7 +27,8 @@ export default function Profile() {
     };
 
     return (
-
+        <Card component="main" style={{maxWidth:"250px",maxHeight:"535px" ,
+            display:"flex",justifyContent:"center",alignItems:"center"}}>
         <Container component="main" maxWidth="xs" >
             <CssBaseline/>
             <Box
@@ -95,5 +97,6 @@ export default function Profile() {
                 </Box>
             </Box>
         </Container>
+        </Card>
     );
 }

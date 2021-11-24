@@ -4,7 +4,10 @@ import {Logo} from "../../components/logo";
 import {Search} from "../../components/search-bar";
 import React from "react";
 import Latest from "../../components/latest";
+import SideBar from "../../components/side-bar";
+/*
 import Profile from "../../components/profile";
+*/
 
 
 //@observer
@@ -22,7 +25,8 @@ export const Home = (props:any) => {
                             <Latest/>
                         </Box>
                         <Box sx={{color: "red", display: 'flex', flex: '10%'}}>
-                            <Profile/>
+                            {/*<Profile/>*/}
+                            <SideBar/>
                         </Box>
                     </Box>
 

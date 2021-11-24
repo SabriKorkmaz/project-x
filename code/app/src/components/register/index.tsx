@@ -42,10 +42,45 @@ export default function Register() {
                         required
                         fullWidth
                         id="email"
+                        variant="outlined"
                         label="Email Address"
                         name="email"
                         autoComplete="email"
                         autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        variant="outlined"
+                        name="password"
+                        label="Password"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        id="email"
+                        variant="outlined"
+                        label="Email Address"
+                        name="email"
+
+                        autoComplete="email"
+                        autoFocus
+                    />
+                    <TextField
+                        margin="normal"
+                        required
+                        fullWidth
+                        name="password"
+                        label="Password"
+                        variant="outlined"
+                        type="password"
+                        id="password"
+                        autoComplete="current-password"
                     />
                     <TextField
                         margin="normal"
@@ -72,38 +107,10 @@ export default function Register() {
                         required
                         fullWidth
                         name="password"
+                        variant="outlined"
                         label="Password"
                         type="password"
-                        id="password"
-                        autoComplete="current-password"
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        autoComplete="current-password"
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        id="email"
-                        label="Email Address"
-                        name="email"
-                        autoComplete="email"
-                        autoFocus
-                    />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
+
                         id="password"
                         autoComplete="current-password"
                     />

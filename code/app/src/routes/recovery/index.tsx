@@ -1,6 +1,5 @@
 //import {observer} from "mobx-react";
 import {Box, Container} from "@material-ui/core";
-import React from "react";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
@@ -10,7 +9,6 @@ import Button from "@mui/material/Button";
 export const Recovery = (props:any) => {
     //const { setSnack } = useContext(SnackbarContext);
     return (
-            <React.Fragment>
                 <Container maxWidth='xl' style={{paddingTop:"100px"}}>
                     <Box sx={{display: "flex",flexDirection:"column"}}>
                         <Typography component="h3" color="black" variant="h6">
@@ -37,6 +35,5 @@ export const Recovery = (props:any) => {
                         Recovery
                     </Button>
                 </Container>
-            </React.Fragment>
     )
 }

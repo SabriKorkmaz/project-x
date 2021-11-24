@@ -7,29 +7,43 @@ import Latest from "./components/latest";
 import Header from "./components/header";
 import {Search} from "./routes/search";
 import {Recovery} from "./routes/recovery";
+import HeaderWithoutSearch from "./components/header-without-search";
+import {Profile} from "./routes/profile";
+import {Services} from "./routes/service";
+import { Events } from "./routes/event";
 
-const App = () => {
+const ProfileLayout = () => {
     return (
-
-        <Header>
+        <HeaderWithoutSearch>
             <Routes>
                 <Route path="/" element={
-                    <Latest/>
+                    <Profile/>
                 }/>
-
-                <Route path="/search/:keyword" element={
-                    <Search/>
+                <Route path="/services" element={
+                    <Services/>
                 }/>
-
-                <Route path="/recovery" element={
-                    <Recovery/>
+                <Route path="/events" element={
+                    <Events/>
                 }/>
             </Routes>
-        </Header>
-
+        </HeaderWithoutSearch>
     )
 };
-
+const ProtectedLayout = () => {
+    return (
+        <HeaderWithoutSearch>
+            <Route path="/users" element={
+                <Recovery/>
+            }/>
+            <Route path="/services" element={
+                <Recovery/>
+            }/>
+            <Route path="/events" element={
+                <Recovery/>
+            }/>
+        </HeaderWithoutSearch>
+    )
+};
 const theme = createTheme({
     palette: {
         type: 'light',
@@ -43,8 +57,39 @@ const theme = createTheme({
             default: '#e0e0e0',
             paper: '#ffffff',
         },
+        text: {
+            secondary: '#000000',
+            primary: '#000000',
+        },
     },
 });
+const App = () => {
+    return <div>
+        <Routes>
+            <Route path="/" element={
+                <Header>
+                    <Latest/>
+                </Header>
+            }/>
+            <Route path="/search/:keyword" element={
+                <Header>
+                    <Search/>
+                </Header>
+            }/>
+            <Route path="/recovery" element={
+                <Header>
+                    <Recovery/>
+                </Header>
+            }/>
+            <Route path="profile/*" element={
+                <ProfileLayout/>
+            }/>
+            <Route path="admin/*" element={
+                <ProtectedLayout/>
+            }/>
+        </Routes>
+    </div>
+}
 ReactDOM.render(
     <BrowserRouter>
         <ThemeProvider theme={theme}>

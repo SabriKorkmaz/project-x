@@ -30,8 +30,6 @@ export const Search = ()=>{
                 />
             </Box>
         </React.Fragment>
-
-
     );
 }
 
