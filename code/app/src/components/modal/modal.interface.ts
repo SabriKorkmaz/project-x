@@ -1,4 +1,4 @@
-export interface ModalType {
-    children:any,
-    buttonName:string;
+export interface ModalProps {
+  children?: any;
+  buttonName: string;
 }
