@@ -1,4 +1,3 @@
-import uuid
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
@@ -6,6 +5,7 @@ from models.index import User
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
+from flask import json
 
 from flask import Blueprint
 
@@ -55,7 +55,7 @@ def get_one_user(current_user, id):
     return jsonify({'user': user_data})
 
 
-@userRoute.route('/user', methods=['POST'])
+@userRoute.route('/user/create', methods=['POST'])
 def create_user():
     data = request.get_json()
 
@@ -66,14 +66,14 @@ def create_user():
                     admin=0,
                     recoveryhash="",
                     surname=data["surname"],
-                    credit=data["credit"],
-                    email=data["surname"],
+                    credit=5,
+                    email=data["email"],
                     invalidattemptcount=0
                     )
     db.session.add(new_user)
     db.session.commit()
 
-    return jsonify({'message': 'New user created!'})
+    return jsonify({"isSuccess": 1,'message': 'New user created!'})
 
 
 @userRoute.route('/user/<id>', methods=['PUT'])
@@ -110,22 +110,25 @@ def delete_user(current_user, id):
     return jsonify({'message': 'The user has been deleted!'})
 
 
-@userRoute.route('/login')
+@userRoute.route('/login',methods=['POST'])
 def login():
-    auth = request.authorization
+    data = request.get_json()
 
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    if not data or not data['email'] or not data['password']:
+        return make_response('Could not verify1', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    user = User.query.filter_by(name=auth.username).first()
+    user = User.query.filter_by(email=data['email']).first()
 
     if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+        return make_response(jsonify({"message": "Could not verify2", "isSuccess": 0}), 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    if check_password_hash(user.password, auth.password):
+    if check_password_hash(user.password, data['password']):
         token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
                            api_secret)
+        user_data = {}
+        user_data['id'] = user.id
+        user_data['name'] = user.name
+        user_data['admin'] = user.admin
+        return jsonify({'token': token.decode('UTF-8'), "isSuccess": 1,"message":"Login successful","user":user_data})
 
-        return jsonify({'token': token.decode('UTF-8')})
-
-    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    return make_response('Could not verify3', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})

@@ -2,7 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Modal from "@mui/material/Modal";
-import { ModalProps } from "./modal.interface";
+import { IModal } from "./interface";
 
 const style = {
   position: "absolute" as "absolute",
@@ -16,7 +16,7 @@ const style = {
   p: 4,
 };
 
-export default function BasicModal(props: ModalProps) {
+export default function BasicModal(props: IModal) {
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);

@@ -8,4 +8,9 @@ export abstract class SessionStorageUtil {
   static setItem(name: string, value: string): void {
     this.storage.setItem(name, value);
   }
+
+  static clear(): void {
+    this.storage.clear();
+    window.location.reload();
+  }
 }

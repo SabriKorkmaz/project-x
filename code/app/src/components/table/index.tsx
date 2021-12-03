@@ -6,7 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import src from "../../assets/logo/Project-x-logos.jpeg";
-import { ITableList } from "./tableList.interface";
+import { ITableList } from "./interface";
 import { Button } from "@material-ui/core";
 
 function createData(

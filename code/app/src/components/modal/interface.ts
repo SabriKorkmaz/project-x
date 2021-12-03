@@ -1,4 +1,4 @@
-export interface ModalProps {
+export interface IModal {
   children?: any;
   buttonName: string;
 }

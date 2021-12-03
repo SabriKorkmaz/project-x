@@ -1,10 +1,11 @@
 import { Box, Container } from "@material-ui/core";
 import { Logo } from "../../components/logo";
-/*import Profile from "../../components/auth";*/
+import Auth from "../../components/auth";
 import React from "react";
+import { IHeader } from "../header/interface";
 import SideBar from "../side-bar";
 
-export default function HeaderWithoutSearch(props: any) {
+export default function HeaderWithoutSearch(props: IHeader) {
   return (
     <React.Fragment>
       <Container maxWidth="xl" style={{ paddingTop: "100px" }}>
@@ -26,8 +27,11 @@ export default function HeaderWithoutSearch(props: any) {
             {props.children}
           </Box>
           <Box sx={{ display: "flex" }}>
-            {/*   <Profile/>*/}
-            <SideBar />
+            {props.auth ? (
+              <SideBar admin={props.admin} username={props.username} />
+            ) : (
+              <Auth />
+            )}
           </Box>
         </Box>
       </Container>

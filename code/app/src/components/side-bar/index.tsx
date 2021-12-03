@@ -6,8 +6,10 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import { useNavigate } from "react-router-dom";
 import CreateModal from "../create-modal";
 import { ModalType } from "../create-modal/modal-type.enum";
+import { SessionStorageUtil } from "../../utils/session-storage.util";
+import { ISideBar } from "./interface";
 
-export default function SideBar() {
+export default function SideBar(props: ISideBar) {
   let navigate = useNavigate();
   return (
     <Card
@@ -36,7 +38,9 @@ export default function SideBar() {
             <AccountCircleOutlinedIcon fontSize="large" />
           </Avatar>
         </ListItem>
-
+        <ListItem style={{ display: "flex", justifyContent: "center" }}>
+          <h6>{`Hi, ${props.username.toUpperCase()}`}</h6>
+        </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
@@ -106,50 +110,51 @@ export default function SideBar() {
             <CreateModal type={ModalType.Service} />
           </Link>
         </ListItem>
-        <ListItem
-          style={{ display: "flex", justifyContent: "center" }}
-          sx={{ borderTop: 1 }}
-          alignItems="center"
-        >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              console.info("I'm a button.");
-            }}
+        <div style={{ display: props.admin ? "block" : "none" }}>
+          <ListItem
+            style={{ display: "flex", justifyContent: "center" }}
+            sx={{ borderTop: 1 }}
+            alignItems="center"
           >
-            Users
-          </Link>
-        </ListItem>
-        <ListItem
-          style={{ display: "flex", justifyContent: "center" }}
-          alignItems="center"
-        >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              console.info("I'm a button.");
-            }}
+            <Link
+              component="button"
+              variant="h4"
+              onClick={() => {
+                console.info("I'm a button.");
+              }}
+            >
+              Users
+            </Link>
+          </ListItem>
+          <ListItem
+            style={{ display: "flex", justifyContent: "center" }}
+            alignItems="center"
           >
-            Services
-          </Link>
-        </ListItem>
-        <ListItem
-          style={{ display: "flex", justifyContent: "center" }}
-          alignItems="center"
-        >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              console.info("I'm a button.");
-            }}
+            <Link
+              component="button"
+              variant="h4"
+              onClick={() => {
+                console.info("I'm a button.");
+              }}
+            >
+              Services
+            </Link>
+          </ListItem>
+          <ListItem
+            style={{ display: "flex", justifyContent: "center" }}
+            alignItems="center"
           >
-            Meetups
-          </Link>
-        </ListItem>
-
+            <Link
+              component="button"
+              variant="h4"
+              onClick={() => {
+                console.info("I'm a button.");
+              }}
+            >
+              Meetups
+            </Link>
+          </ListItem>
+        </div>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
@@ -158,7 +163,7 @@ export default function SideBar() {
             component="button"
             variant="outlined"
             onClick={() => {
-              console.info("I'm a button.");
+              SessionStorageUtil.clear();
             }}
           >
             Logout

@@ -4,12 +4,13 @@ import jwt
 import datetime
 from models.index import User
 from func.token import token_required
-from constants.index import api_secret
+from shared.index import api_secret
 from flask import request, jsonify, make_response
 
 from flask import Blueprint
 
 from models.index import db
+
 serviceRoute = Blueprint('user', __name__, )
 
 

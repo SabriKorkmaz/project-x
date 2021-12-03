@@ -5,7 +5,7 @@ import { ModalType } from "./modal-type.enum";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
-import { CreateModalProps } from "./create-modal.interface";
+import { CreateModalProps } from "./interface";
 import { Container } from "@material-ui/core";
 
 export default function CreateModal(props: CreateModalProps) {
