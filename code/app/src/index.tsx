@@ -2,7 +2,7 @@ import ReactDOM from "react-dom";
 import * as serviceWorker from "./serviceWorker";
 import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { createTheme, Snackbar } from "@material-ui/core";
-import { ThemeProvider } from "@mui/material";
+import { AlertProps, ThemeProvider } from "@mui/material";
 import Latest from "./components/latest";
 import Header from "./components/header";
 import { Search } from "./routes/search";
@@ -83,11 +83,13 @@ const theme = createTheme({
       default: "#e0e0e0",
       paper: "#ffffff",
     },
-
-    warning: {
-      main: "#B33A3A",
-    },
   },
+});
+const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
+  props,
+  ref
+) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
 const App = () => {
@@ -97,22 +99,35 @@ const App = () => {
     open: false,
   });
   const handleClose = () => {
-    setSnack({ message: "", type: "error" as AlertColor, open: false });
+    setSnack((prevState) => ({
+      open: false,
+      type: prevState.type,
+      message: prevState.message,
+    }));
   };
-
   return (
     <SnackbarContext.Provider value={{ snack, setSnack }}>
       <Snackbar
         transitionDuration={200}
-        autoHideDuration={1000}
+        autoHideDuration={3000}
         open={snack.open}
         onClose={handleClose}
         message={snack.message}
         anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
       >
-        <MuiAlert severity={snack.type}>
-          <h3>{snack.message}</h3>
-        </MuiAlert>
+        <Alert
+          sx={{ width: "100%" }}
+          style={{
+            display: "flex",
+            fontSize: 16,
+            justifyContent: "center",
+            alignContent: "center",
+          }}
+          elevation={6}
+          severity={snack.type}
+        >
+          {snack.message}
+        </Alert>
       </Snackbar>
       <React.Fragment>
         <AllRoute />

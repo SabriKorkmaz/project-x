@@ -5,7 +5,6 @@ from models.index import User
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
-from flask import json
 
 from flask import Blueprint
 
@@ -131,4 +130,4 @@ def login():
         user_data['admin'] = user.admin
         return jsonify({'token': token.decode('UTF-8'), "isSuccess": 1,"message":"Login successful","user":user_data})
 
-    return make_response('Could not verify3', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    return make_response(jsonify({"message": "Could not verify2", "isSuccess": 0}), 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})

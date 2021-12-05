@@ -4,16 +4,17 @@ import { LoginModel } from "../user/login.inteface";
 import { ResponseModel } from "./response.interface";
 
 export abstract class BaseService {
-  private static readonly baseUrl = "http://localhost:4444/";
+  public static readonly baseUrl = "http://localhost:4444/";
   private static axios?: AxiosInstance;
-  private static readonly authToken: string = "auth-token";
+  private static readonly authToken: string = "x-access-token";
 
   static async initAxios() {
     if (this.axios) return;
     let token = await SessionStorageUtil.getItem(this.authToken);
+
     this.axios = Axios.create({
       headers: {
-        "auth-token": `${token}`,
+        "x-access-token": `${token}`,
       },
       baseURL: this.baseUrl,
     });
@@ -51,6 +52,7 @@ export abstract class BaseService {
 
   static async postData(request: any, url: string): Promise<ReturnType<any>> {
     try {
+      console.log(url);
       await this.initAxios();
       let response = await this.axios!.post(this.baseUrl + url, request);
       return response.data;

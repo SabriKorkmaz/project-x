@@ -18,7 +18,7 @@ export default function Register() {
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   const handleSubmit = async () => {
-    let result = await UserService.save({
+    let result = await UserService.create({
       name: name,
       surname: surname,
       email: email,
@@ -30,6 +30,7 @@ export default function Register() {
       open: true,
       type: result.isSuccess ? "success" : "error",
     });
+
     setInterval(() => {
       window.location.reload();
     }, 1333);

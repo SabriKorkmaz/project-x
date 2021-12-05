@@ -30,11 +30,13 @@ export default function Auth() {
       password: password,
     });
 
-    setSnack({
-      message: result.message,
-      open: true,
-      type: result.isSuccess ? "success" : "error",
-    });
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
     if (result.isSuccess) {
       setInterval(() => {
         window.location.reload();
@@ -47,7 +49,7 @@ export default function Auth() {
       component="main"
       style={{
         maxWidth: "250px",
-        maxHeight: "535px",
+        height: "535px",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",

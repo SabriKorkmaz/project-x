@@ -1,127 +1,115 @@
-import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
 import datetime
-from models.index import User
+from models.index import Service
 from func.token import token_required
-from shared.index import api_secret
-from flask import request, jsonify, make_response
-
+from flask import request, jsonify
+from werkzeug.utils import secure_filename
 from flask import Blueprint
 
 from models.index import db
 
-serviceRoute = Blueprint('user', __name__, )
+serviceRoute = Blueprint('service', __name__, )
 
 
-@serviceRoute.route('/user', methods=['GET'])
+@serviceRoute.route('/services', methods=['GET'])
 @token_required
-def get_all_users(current_user):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def get_all_services():
+    services = Service.query.all()
 
-    users = User.query.all()
+    data = []
 
-    output = []
+    for service in services:
+        value = {'name': service.name, 'title': service.title, 'description': service.description,
+                 "credit": service.credit,
+                 'attendeeLimit': service.attendeeLimit, 'address': service.address, 'imageUrl': service.imageUrl,
+                 'duration': service.duration,
+                 'date': service.date}
+        data.append(value)
 
-    for user in users:
-        user_data = {}
-        user_data['id'] = user.id
-        user_data['name'] = user.name
-        user_data['password'] = user.password
-        user_data['admin'] = user.admin
-        output.append(user_data)
-
-    return jsonify({'users': output})
+    return jsonify({'services': data, "isSuccess": 1})
 
 
-@serviceRoute.route('/user/<id>', methods=['GET'])
+@serviceRoute.route('/service/<id>', methods=['GET'])
 @token_required
-def get_one_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def get_one_service(id):
+    service = Service.query.filter_by(id=id).first()
 
-    user = User.query.filter_by(id=id).first()
+    if not service:
+        return jsonify({'message': 'No service found!', "isSuccess": 0})
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
+    value = {'name': service.name, 'title': service.title, 'description': service.description, 'credit': service.credit,
+             'attendeeLimit': service.attendeeLimit, 'address': service.address, 'imageUrl': service.imageUrl,
+             'duration': service.duration,
+             'date': service.date}
 
-    user_data = {}
-    user_data['id'] = user.id
-    user_data['name'] = user.name
-    user_data['password'] = user.password
-    user_data['admin'] = user.admin
-
-    return jsonify({'user': user_data})
+    return jsonify({'service': value, "isSuccess": 1})
 
 
-@serviceRoute.route('/user', methods=['POST'])
+@serviceRoute.route('/service/create', methods=['POST'])
 @token_required
-def create_user(current_user):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
-
+def create_service():
     data = request.get_json()
 
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-
-    new_user = User(id=str(uuid.uuid4()), name=data['name'], password=hashed_password, type=1)
-    db.session.add(new_user)
+    new_service = Service(
+        name=data['name'],
+        title=data['title'],
+        description=data['title'],
+        attendeeLimit=data['attendeeLimit'],
+        address=data['address'],
+        duration=data['duration'],
+        imageUrl=data['img'],
+        credit=data['creadit'],
+        date=data['date'],
+        userId=data['userId'],
+        createdDate=datetime.datetime
+    )
+    db.session.add(new_service)
     db.session.commit()
 
-    return jsonify({'message': 'New user created!'})
+    return jsonify({'message': 'New service created!', "isSuccess": 1})
 
 
-@serviceRoute.route('/user/<id>', methods=['PUT'])
+@serviceRoute.route('/service/edit/<id>', methods=['POST'])
 @token_required
-def promote_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def update_service(id):
+    data = request.get_json()
 
-    user = User.query.filter_by(id=id).first()
+    service: object = Service.query.filter_by(id=id).first()
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
+    service.name = data['name'],
+    service.title = data['title'],
+    service.description = data['title'],
+    service.attendeeLimit = data['attendeeLimit'],
+    service.address = data['address'],
+    service.imageUrl = data['img'],
+    service.date = data['date'],
+    service.credit = data['credit'],
+    service.duration = data['duration'],
+    service.userId = data['userId'],
+    service.createddate = datetime.datetime
 
-    user.admin = True
     db.session.commit()
 
-    return jsonify({'message': 'The user has been promoted!'})
+    return jsonify({'message': 'New service created!', "isSuccess": 1})
 
 
-@serviceRoute.route('/user/<id>', methods=['DELETE'])
+@serviceRoute.route('/service/delete/<id>', methods=['DELETE'])
 @token_required
-def delete_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def delete_service(id):
+    service = Service.query.filter_by(id=id).first()
 
-    user = User.query.filter_by(id=id).first()
+    if not service:
+        return jsonify({'message': 'No user found!', "isSuccess": 0})
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
-
-    db.session.delete(user)
+    db.session.delete(service)
     db.session.commit()
 
-    return jsonify({'message': 'The user has been deleted!'})
+    return jsonify({'message': 'The service has been deleted!', "isSuccess": 1})
 
 
-@serviceRoute.route('/login')
-def login():
-    auth = request.authorization
-
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
-
-    user = User.query.filter_by(name=auth.username).first()
-
-    if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
-
-    if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
-                           api_secret)
-
-        return jsonify({'token': token.decode('UTF-8')})
-
-    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+@serviceRoute.route('/service/upload', methods=['POST', 'GET'])
+@token_required
+def upload_file():
+    if request.method == 'POST':
+        f = request.files['file']
+        f.save(secure_filename(f.filename))
+        return jsonify({'message': 'File successfully uploaded!', "isSuccess": 1})

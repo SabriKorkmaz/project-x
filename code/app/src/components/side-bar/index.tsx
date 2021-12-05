@@ -16,7 +16,7 @@ export default function SideBar(props: ISideBar) {
       component="main"
       style={{
         minWidth: "250px",
-        maxHeight: "535px",
+        height: "535px",
         marginTop: 1,
         display: "flex",
         flexDirection: "column",

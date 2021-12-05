@@ -1,126 +1,125 @@
-import uuid
-from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
 import datetime
-from models.index import User
+import os
+from models.index import Meetup
 from func.token import token_required
-from constants.index import api_secret
-from flask import request, jsonify, make_response
-
+from flask import request, jsonify, url_for
+from werkzeug.utils import secure_filename
 from flask import Blueprint
-
+from flask import send_from_directory
 from models.index import db
+from shared.index import UPLOAD_FOLDER
+
 meetupRoute = Blueprint('meetup', __name__, )
 
 
-@meetupRoute.route('/user', methods=['GET'])
+@meetupRoute.route('/meetups', methods=['GET'])
 @token_required
-def get_all_users(current_user):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def get_all_meetups():
+    meetups = Meetup.query.all()
 
-    users = User.query.all()
+    data = []
 
-    output = []
+    for meetup in meetups:
+        value = {'name': meetup.name, 'title': meetup.title, 'description': meetup.description,
+                 'duration': meetup.duration,
+                 'attendeeLimit': meetup.attendeeLimit, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+                 'date': meetup.date}
+        data.append(value)
 
-    for user in users:
-        user_data = {}
-        user_data['id'] = user.id
-        user_data['name'] = user.name
-        user_data['password'] = user.password
-        user_data['admin'] = user.admin
-        output.append(user_data)
-
-    return jsonify({'users': output})
+    return jsonify({'meetups': data, "isSuccess": 1})
 
 
-@meetupRoute.route('/user/<id>', methods=['GET'])
+@meetupRoute.route('/meetup/<id>', methods=['GET'])
 @token_required
-def get_one_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def get_one_meetup(id):
+    meetup = Meetup.query.filter_by(id=id).first()
 
-    user = User.query.filter_by(id=id).first()
+    if not meetup:
+        return jsonify({'message': 'No meetup found!', "isSuccess": 0})
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
+    value = {'name': meetup.name, 'title': meetup.title, 'description': meetup.description,
+             'duration': meetup.duration,
+             'attendeeLimit': meetup.attendeeLimit, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+             'date': meetup.date}
 
-    user_data = {}
-    user_data['id'] = user.id
-    user_data['name'] = user.name
-    user_data['password'] = user.password
-    user_data['admin'] = user.admin
-
-    return jsonify({'user': user_data})
+    return jsonify({'meetup': value, "isSuccess": 1})
 
 
-@meetupRoute.route('/user', methods=['POST'])
+@meetupRoute.route('/meetup/create', methods=['POST'])
 @token_required
-def create_user(current_user):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
-
+def create_meetup():
     data = request.get_json()
 
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-
-    new_user = User(id=str(uuid.uuid4()), name=data['name'], password=hashed_password, type=1)
-    db.session.add(new_user)
+    new_meetup = Meetup(
+        name=data['name'],
+        title=data['title'],
+        description=data['title'],
+        attendeeLimit=data['attendeeLimit'],
+        duration=data['duration'],
+        address=data['address'],
+        imageUrl=data['img'],
+        date=data['date'],
+        userId=data['userId'],
+        createddate=datetime.datetime
+    )
+    db.session.add(new_meetup)
     db.session.commit()
 
-    return jsonify({'message': 'New user created!'})
+    return jsonify({'message': 'New meetup created!', "isSuccess": 1})
 
 
-@meetupRoute.route('/user/<id>', methods=['PUT'])
+@meetupRoute.route('/meetup/edit/<id>', methods=['POST'])
 @token_required
-def promote_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def update_meetup(id):
+    data = request.get_json()
 
-    user = User.query.filter_by(id=id).first()
+    meetup: object = Meetup.query.filter_by(id=id).first()
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
+    meetup.name = data['name'],
+    meetup.title = data['title'],
+    meetup.description = data['title'],
+    meetup.attendeeLimit = data['attendeeLimit'],
+    meetup.address = data['address'],
+    meetup.imageUrl = data['img'],
+    meetup.date = data['date'],
+    meetup.duration = data['duration'],
+    meetup.userId = data['userId'],
+    meetup.createddate = datetime.datetime
 
-    user.admin = True
     db.session.commit()
 
-    return jsonify({'message': 'The user has been promoted!'})
+    return jsonify({'message': 'New meetup created!', "isSuccess": 1})
 
 
-@meetupRoute.route('/user/<id>', methods=['DELETE'])
+@meetupRoute.route('/meetup/delete/<id>', methods=['DELETE'])
 @token_required
-def delete_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
+def delete_user(id):
+    meetup = Meetup.query.filter_by(id=id).first()
 
-    user = User.query.filter_by(id=id).first()
+    if not meetup:
+        return jsonify({'message': 'No user found!', "isSuccess": 0})
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
-
-    db.session.delete(user)
+    db.session.delete(meetup)
     db.session.commit()
 
-    return jsonify({'message': 'The user has been deleted!'})
+    return jsonify({'message': 'The user has been deleted!', "isSuccess": 1})
 
 
-@meetupRoute.route('/login')
-def login():
-    auth = request.authorization
+@meetupRoute.route('/meetup/upload', methods=['POST', "GET"])
+@token_required
+def upload_file(current_user):
+    if request.method == 'POST':
+        f = request.files['file']
+        filename = secure_filename(f.filename)
+        print(filename)
+        f.save(os.path.join(UPLOAD_FOLDER, filename))
+        return jsonify(
+            {'message': 'File successfully uploaded!',
+             "url": url_for('download_file', name=filename),
+             'path': os.path.join(UPLOAD_FOLDER, filename) ,
+             "isSuccess": 1})
 
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    user = User.query.filter_by(name=auth.username).first()
-
-    if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
-
-    if check_password_hash(user.password, auth.password):
-        token = jwt.encode({'id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)},
-                           api_secret)
-
-        return jsonify({'token': token.decode('UTF-8')})
-
-    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+@meetupRoute.route('/uploads/<name>')
+def download_file(name):
+    return send_from_directory(os.path.join(UPLOAD_FOLDER), name)
