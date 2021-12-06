@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 from models.index import Meetup
 from func.token import token_required
@@ -29,7 +29,7 @@ def get_all_meetups():
     return jsonify({'meetups': data, "isSuccess": 1})
 
 
-@meetupRoute.route('/meetup/<id>', methods=['GET'])
+@meetupRoute.route('/meetup/get/<id>', methods=['GET'])
 @token_required
 def get_one_meetup(id):
     meetup = Meetup.query.filter_by(id=id).first()
@@ -47,9 +47,9 @@ def get_one_meetup(id):
 
 @meetupRoute.route('/meetup/create', methods=['POST'])
 @token_required
-def create_meetup():
+def create_meetup(current_user):
     data = request.get_json()
-
+    print(current_user.id)
     new_meetup = Meetup(
         name=data['name'],
         title=data['title'],
@@ -57,10 +57,11 @@ def create_meetup():
         attendeeLimit=data['attendeeLimit'],
         duration=data['duration'],
         address=data['address'],
-        imageUrl=data['img'],
-        date=data['date'],
-        userId=data['userId'],
-        createddate=datetime.datetime
+        imageUrl=data['imageUrl'],
+        credit=data['credit'],
+        date=datetime.now(),
+        userId=current_user.id,
+        createddate=datetime.now()
     )
     db.session.add(new_meetup)
     db.session.commit()
@@ -70,7 +71,7 @@ def create_meetup():
 
 @meetupRoute.route('/meetup/edit/<id>', methods=['POST'])
 @token_required
-def update_meetup(id):
+def update_meetup(current_user,id):
     data = request.get_json()
 
     meetup: object = Meetup.query.filter_by(id=id).first()
@@ -80,11 +81,12 @@ def update_meetup(id):
     meetup.description = data['title'],
     meetup.attendeeLimit = data['attendeeLimit'],
     meetup.address = data['address'],
-    meetup.imageUrl = data['img'],
+    meetup.imageUrl = data['imageUrl'],
     meetup.date = data['date'],
     meetup.duration = data['duration'],
-    meetup.userId = data['userId'],
-    meetup.createddate = datetime.datetime
+    meetup.credit = data['credit'],
+    meetup.userId = current_user.id,
+    meetup.createddate = datetime.datetime.date()
 
     db.session.commit()
 
@@ -116,7 +118,7 @@ def upload_file(current_user):
         return jsonify(
             {'message': 'File successfully uploaded!',
              "url": url_for('download_file', name=filename),
-             'path': os.path.join(UPLOAD_FOLDER, filename) ,
+             'path': os.path.join(UPLOAD_FOLDER, filename),
              "isSuccess": 1})
 
 

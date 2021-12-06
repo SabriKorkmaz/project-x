@@ -37,13 +37,11 @@ class Service(db.Model):
     userId = db.Column(db.Integer, unique=False)
     createdDate = db.Column(db.DateTime, unique=False)
 
-    def __init__(self, name, title, description,duration, attendeeLimit, state, country, credit, address, imageUrl, date, userId,createdDate):
+    def __init__(self, name, title, description,duration, attendeeLimit, credit, address, imageUrl, date, userId,createdDate):
         self.name = name
         self.title = title
         self.description = description
         self.attendeeLimit = attendeeLimit
-        self.state = state
-        self.country = country
         self.credit = credit
         self.address = address
         self.imageUrl = imageUrl
@@ -59,8 +57,6 @@ class Meetup(db.Model):
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(420), unique=False)
     attendeeLimit = db.Column(db.Integer, unique=False)
-    state = db.Column(db.String(120), unique=False)
-    country = db.Column(db.String(120), unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
@@ -68,13 +64,11 @@ class Meetup(db.Model):
     userId = db.Column(db.Integer, unique=False)
     createdDate = db.Column(db.DateTime, unique=False)
 
-    def __init__(self, name, title, description,duration, attendeeLimit,state, country, credit, address, imageUrl, date, userId,createddate):
+    def __init__(self, name, title, description,duration, attendeeLimit, credit, address, imageUrl, date, userId,createddate):
         self.name = name
         self.title = title
         self.description = description
         self.attendeeLimit = attendeeLimit
-        self.state = state
-        self.country = country
         self.credit = credit
         self.duration = duration
         self.address = address

@@ -14,7 +14,7 @@ def token_required(f):
             token = request.headers['x-access-token']
 
         if not token:
-            return jsonify({'message' : 'Token is missing!'}), 401
+            return jsonify({'message' : 'Token is missing!', "isSuccess": 0}), 401
 
         try:
             data = jwt.decode(token, api_secret)
