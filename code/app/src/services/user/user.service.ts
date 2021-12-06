@@ -10,6 +10,6 @@ export abstract class UserService {
   }
 
   static async create(request: Partial<UserModel>) {
-    return await BaseService.postData(request, this.baseUrl + "/create");
+    return await BaseService.postData(request, this.baseUrl + "create");
   }
 }

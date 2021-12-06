@@ -1,5 +1,5 @@
 import ListItem from "@mui/material/ListItem";
-import { Box, Button, Card, Link } from "@material-ui/core";
+import { Box, Button, Card } from "@material-ui/core";
 import CssBaseline from "@mui/material/CssBaseline";
 import Avatar from "@mui/material/Avatar";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
@@ -8,9 +8,16 @@ import CreateModal from "../create-modal";
 import { ModalType } from "../create-modal/modal-type.enum";
 import { SessionStorageUtil } from "../../utils/session-storage.util";
 import { ISideBar } from "./interface";
+import { Link } from "react-router-dom";
 
 export default function SideBar(props: ISideBar) {
   let navigate = useNavigate();
+  const userName = () => {
+    if (props.user.name) {
+      return <h6>{`Hi, ${props.user.name?.toUpperCase()}`}</h6>;
+    }
+    return;
+  };
   return (
     <Card
       component="main"
@@ -39,19 +46,13 @@ export default function SideBar(props: ISideBar) {
           </Avatar>
         </ListItem>
         <ListItem style={{ display: "flex", justifyContent: "center" }}>
-          <h6>{`Hi, ${props.username.toUpperCase()}`}</h6>
+          {userName()}
         </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link
-            component="button"
-            variant="h5"
-            onClick={() => {
-              navigate("/profile", { replace: true });
-            }}
-          >
+          <Link to="/Profile">
             <Button variant="outlined" size="large">
               My Profile
             </Button>
@@ -61,13 +62,7 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              navigate("/profile/meetups", { replace: true });
-            }}
-          >
+          <Link to="/profile/meetups">
             <Button variant="outlined" size="large">
               My Meetps
             </Button>
@@ -77,13 +72,7 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              navigate("/profile/services", { replace: true });
-            }}
-          >
+          <Link to="/profile/services">
             {" "}
             <Button variant="outlined" size="large">
               My Services
@@ -94,65 +83,33 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <CreateModal type={ModalType.Meetup} />
+          <CreateModal userId={props.user.id} type={ModalType.Meetup} />
         </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link
-            component="button"
-            variant="h4"
-            onClick={() => {
-              console.info("I'm a button.");
-            }}
-          >
-            <CreateModal type={ModalType.Service} />
-          </Link>
+          <CreateModal userId={props.user.id} type={ModalType.Service} />
         </ListItem>
-        <div style={{ display: props.admin ? "block" : "none" }}>
+        <div style={{ display: props.user.admin ? "block" : "none" }}>
           <ListItem
             style={{ display: "flex", justifyContent: "center" }}
             sx={{ borderTop: 1 }}
             alignItems="center"
           >
-            <Link
-              component="button"
-              variant="h4"
-              onClick={() => {
-                console.info("I'm a button.");
-              }}
-            >
-              Users
-            </Link>
+            <Link to="/admin/users">Users</Link>
           </ListItem>
           <ListItem
             style={{ display: "flex", justifyContent: "center" }}
             alignItems="center"
           >
-            <Link
-              component="button"
-              variant="h4"
-              onClick={() => {
-                console.info("I'm a button.");
-              }}
-            >
-              Services
-            </Link>
+            <Link to="/admin/services">Services</Link>
           </ListItem>
           <ListItem
             style={{ display: "flex", justifyContent: "center" }}
             alignItems="center"
           >
-            <Link
-              component="button"
-              variant="h4"
-              onClick={() => {
-                console.info("I'm a button.");
-              }}
-            >
-              Meetups
-            </Link>
+            <Link to="/admin/meetups">Meetups</Link>
           </ListItem>
         </div>
         <ListItem
@@ -164,6 +121,8 @@ export default function SideBar(props: ISideBar) {
             variant="outlined"
             onClick={() => {
               SessionStorageUtil.clear();
+              navigate("/", { replace: true });
+              window.location.reload();
             }}
           >
             Logout

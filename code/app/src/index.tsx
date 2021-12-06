@@ -23,8 +23,11 @@ import { Navigate } from "react-router-dom";
 import { UserModel } from "./services/user/user.inteface";
 
 export const SnackbarContext = createContext({});
+let isAuth = () => {
+  return SessionStorageUtil.getItem("auth") === "true";
+};
 const ProfileLayout = (props: any) => {
-  if (!MainStore.auth) {
+  if (!props.auth) {
     return (
       <Navigate
         to={{
@@ -34,11 +37,7 @@ const ProfileLayout = (props: any) => {
     );
   }
   return (
-    <HeaderWithoutSearch
-      username={props.username}
-      auth={props.email}
-      admin={props.admin}
-    >
+    <HeaderWithoutSearch auth={props.auth} user={props.user}>
       <Routes>
         <Route path="/" element={<Profile />} />
         <Route path="/services" element={<Services />} />
@@ -59,11 +58,7 @@ const ProtectedLayout = (props: any) => {
   }
 
   return (
-    <HeaderWithoutSearch
-      username={props.username}
-      auth={props.auth}
-      admin={props.admin}
-    >
+    <HeaderWithoutSearch auth={props.auth} user={props.user}>
       <Route path="/users" element={<Recovery />} />
       <Route path="/services" element={<Recovery />} />
       <Route path="/meetups" element={<Recovery />} />
@@ -137,12 +132,10 @@ const App = () => {
 };
 
 const AllRoute = observer(() => {
-  let [auth, setAuth] = useState(false);
+  let auth = isAuth();
   let [user, setUser] = useState({} as UserModel);
   useEffect(() => {
-    auth = SessionStorageUtil.getItem("auth") === "true";
     let userString = SessionStorageUtil.getItem("user");
-    setAuth(auth);
     if (userString) {
       user = JSON.parse(userString ?? "");
       setUser(user);
@@ -156,7 +149,7 @@ const AllRoute = observer(() => {
         <Route
           path="/"
           element={
-            <Header username={user.name} admin={user.admin} auth={auth}>
+            <Header user={user} auth={auth}>
               <Latest />
             </Header>
           }
@@ -164,7 +157,7 @@ const AllRoute = observer(() => {
         <Route
           path="/search/:keyword"
           element={
-            <Header username={user.name} admin={user.admin} auth={auth}>
+            <Header user={user} auth={auth}>
               <Search />
             </Header>
           }
@@ -172,30 +165,18 @@ const AllRoute = observer(() => {
         <Route
           path="/recovery"
           element={
-            <Header username={user.name} admin={user.admin} auth={auth}>
+            <Header user={user} auth={auth}>
               <Recovery />
             </Header>
           }
         />
         <Route
           path="profile/*"
-          element={
-            <ProfileLayout
-              auth={auth}
-              username={user.name}
-              admin={user.admin}
-            />
-          }
+          element={<ProfileLayout auth={auth} user={user} />}
         />
         <Route
           path="admin/*"
-          element={
-            <ProtectedLayout
-              auth={auth}
-              username={user.name}
-              admin={user.admin}
-            />
-          }
+          element={<ProtectedLayout auth={auth} user={user} />}
         />
       </Routes>
     </div>

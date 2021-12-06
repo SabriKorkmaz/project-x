@@ -1,16 +1,13 @@
 import { BaseModel } from "../base/base.interface";
 
 export interface ServiceModel extends BaseModel {
-  email: string;
   name: string;
   description: string;
+  title: string;
   attendeeLimit: number;
-  state: string;
-  country: string;
-  address: string;
+  duration: string;
   credit: number;
   imageUrl: string;
-  data: string;
+  date: Date | null;
   userId: number;
-  password: string;
 }

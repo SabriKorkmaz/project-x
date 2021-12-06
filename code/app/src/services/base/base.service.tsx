@@ -26,18 +26,44 @@ export abstract class BaseService {
         if (error.response.status === 500) {
           error.response.data = { message: "Unexpected error" };
         }
+        if (error.response.status === 401) {
+          console.log(error.response.status);
+          setInterval(() => {
+            SessionStorageUtil.clear();
+            window.location.reload();
+          }, 1000);
+        }
         return Promise.reject(error.response);
       }
     );
   }
 
   static async getDataArrayFromApi<ReturnType>(
-    apiUrl: string,
-    request: any
+    request: any,
+    apiUrl: string
   ): Promise<ReturnType[]> {
     try {
       await this.initAxios();
-      let response = await this.axios!.post(this.baseUrl + "login", request);
+      let response = await this.axios!.get(this.baseUrl + apiUrl, request);
+      return response.data;
+    } catch (error: any) {
+      if (error.status === 401) {
+        SessionStorageUtil.setItem(this.authToken, "");
+        SessionStorageUtil.setItem("auth", "false");
+        SessionStorageUtil.setItem("user", "");
+        window.location.reload();
+      }
+      return error.data;
+    }
+  }
+
+  static async getDataFromApi<ReturnType>(
+    request: any,
+    apiUrl: string
+  ): Promise<ReturnType> {
+    try {
+      await this.initAxios();
+      let response = await this.axios!.get(this.baseUrl + apiUrl, request);
       return response.data;
     } catch (error: any) {
       if (error.status === 401) {

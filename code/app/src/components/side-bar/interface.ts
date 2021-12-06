@@ -1,4 +1,5 @@
+import { UserModel } from "../../services/user/user.inteface";
+
 export interface ISideBar {
-  username: string;
-  admin: boolean;
+  user: UserModel;
 }

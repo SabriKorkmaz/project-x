@@ -29,11 +29,7 @@ export default function Header(props: IHeader) {
             {props.children}
           </Box>
           <Box sx={{ display: "flex" }}>
-            {props.auth ? (
-              <SideBar admin={props.admin} username={props.username} />
-            ) : (
-              <Auth />
-            )}
+            {props.auth ? <SideBar user={props.user} /> : <Auth />}
           </Box>
         </Box>
       </Container>

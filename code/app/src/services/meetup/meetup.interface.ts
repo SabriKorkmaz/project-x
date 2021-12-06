@@ -1,15 +1,12 @@
 import { BaseModel } from "../base/base.interface";
 
-export interface Meetup extends BaseModel {
-  email: string;
+export interface MeetupModel extends BaseModel {
   name: string;
   description: string;
+  title: string;
   attendeeLimit: number;
-  address: string;
-  credit: number;
-  duration: number;
+  duration: string;
   imageUrl: string;
-  data: string;
+  date: Date | null;
   userId: number;
-  password: string;
 }

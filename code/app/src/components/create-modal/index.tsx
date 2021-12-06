@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import BasicModal from "../modal";
 import { ModalType } from "./modal-type.enum";
 import Box from "@mui/material/Box";
@@ -11,14 +11,32 @@ import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import DateTimePicker from "@mui/lab/DateTimePicker";
 import { InputLabel } from "@mui/material";
 import { MeetupService } from "../../services/meetup/meetup.service";
+import { ServiceService } from "../../services/service/service.service";
+import { ServiceModel } from "../../services/service/service.interface";
+import { SnackbarContext } from "../../index";
+import { MeetupModel } from "../../services/meetup/meetup.interface";
+import { BaseService } from "../../services/base/base.service";
 
 export default function CreateModal(props: CreateModalProps) {
   let ModalName = `Create ${
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
+  // @ts-ignore
+  const { setSnack } = useContext(SnackbarContext);
   let Adapter = AdapterDateFns as any;
+  const [input, setInput] = useState({
+    name: "",
+    title: "",
+    attendeeLimit: 1,
+    address: "",
+    credit: 1,
+    duration: "",
+    description: "",
+    userId: props.userId,
+    id: 0,
+  });
   const [date, setDate] = React.useState<Date | null>(new Date());
-  const [imgSource, setImgSource] = useState("");
+  const [imageUrl, setImgSource] = useState("");
   const [file, setFile] = useState(null as any);
   const onFileChange = (event: any) => {
     setFile(event.target.files[0]);
@@ -27,10 +45,65 @@ export default function CreateModal(props: CreateModalProps) {
     const formData = new FormData();
     formData.append("file", file as any, file.name);
     let result = await MeetupService.upload(formData);
-    console.log(result);
-    setImgSource(result.url);
+    if (result.isSuccess) {
+      result.url = BaseService.baseUrl + result.url.slice(1);
+      setImgSource(result.url);
+    }
+    setSnack({
+      message: result.message,
+      open: true,
+      type: result.isSuccess ? "success" : "error",
+    });
+  };
 
-    console.log(result);
+  const save = async () => {
+    let result = null;
+    if (props.type === ModalType.Service) {
+      let service: ServiceModel = { ...input, date, imageUrl };
+      console.log(service);
+      result = await ServiceService.save(service);
+    } else if (props.type === ModalType.Meetup) {
+      let meetup: MeetupModel = { ...input, date, imageUrl };
+      console.log(meetup);
+
+      result = await MeetupService.save(meetup);
+    }
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
+  };
+  const creditInput = () => {
+    if (props.type === ModalType.Service) {
+      return (
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          value={input.credit}
+          onChange={(e) => {
+            if (e.target.value) {
+              e.persist();
+              setInput((prevState) => ({
+                ...prevState,
+                credit: parseInt(e.target.value),
+              }));
+            }
+          }}
+          id="credit"
+          variant="outlined"
+          type="number"
+          label="Credit"
+          name="credit"
+          autoComplete="credit"
+          autoFocus
+        />
+      );
+    }
+    return;
   };
 
   return (
@@ -48,6 +121,15 @@ export default function CreateModal(props: CreateModalProps) {
               margin="normal"
               required
               fullWidth
+              value={input.name}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  name: e.target.value,
+                }));
+              }}
               id="name"
               variant="outlined"
               label="Name"
@@ -58,6 +140,15 @@ export default function CreateModal(props: CreateModalProps) {
             <TextField
               margin="normal"
               required
+              value={input.title}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  title: e.target.value,
+                }));
+              }}
               fullWidth
               variant="outlined"
               name="title"
@@ -69,6 +160,15 @@ export default function CreateModal(props: CreateModalProps) {
             <TextField
               margin="normal"
               required
+              value={input.address}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  address: e.target.value,
+                }));
+              }}
               fullWidth
               variant="outlined"
               name="address"
@@ -81,6 +181,15 @@ export default function CreateModal(props: CreateModalProps) {
             <TextField
               margin="normal"
               required
+              value={input.description}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  description: e.target.value,
+                }));
+              }}
               multiline={true}
               fullWidth
               minRows={8}
@@ -97,19 +206,17 @@ export default function CreateModal(props: CreateModalProps) {
             noValidate
             sx={{ mt: 1 }}
           >
-            <LocalizationProvider dateAdapter={Adapter}>
-              <DateTimePicker
-                renderInput={(props) => <TextField {...props} />}
-                label="Date"
-                value={date}
-                onChange={(newValue) => {
-                  setDate(newValue);
-                }}
-              />
-            </LocalizationProvider>
             <TextField
-              margin="normal"
               required
+              value={input.duration}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  duration: e.target.value,
+                }));
+              }}
               fullWidth
               id="duration"
               variant="outlined"
@@ -117,10 +224,22 @@ export default function CreateModal(props: CreateModalProps) {
               name="Duration"
               autoComplete="duration"
             />
+
             <TextField
               margin="normal"
               required
               fullWidth
+              value={input.attendeeLimit}
+              onChange={(e) => {
+                e.persist();
+
+                if (e.target.value) {
+                  setInput((prevState) => ({
+                    ...prevState,
+                    attendeeLimit: parseInt(e.target.value),
+                  }));
+                }
+              }}
               id="attendeeLimit"
               variant="outlined"
               type="number"
@@ -129,6 +248,18 @@ export default function CreateModal(props: CreateModalProps) {
               autoComplete="attendeeLimit"
               autoFocus
             />
+            {creditInput()}
+            <LocalizationProvider dateAdapter={Adapter}>
+              <DateTimePicker
+                renderInput={(props) => <TextField {...props} />}
+                label="Date"
+                value={date}
+                inputFormat={"mm/dd/yy hh:mm:ss"}
+                onChange={(newValue) => {
+                  setDate(new Date(newValue as any));
+                }}
+              />
+            </LocalizationProvider>
 
             <InputLabel htmlFor="import-button" style={{ border: "none" }}>
               <Input
@@ -148,10 +279,15 @@ export default function CreateModal(props: CreateModalProps) {
                 Upload
               </Button>
             </InputLabel>
-            <img width={"300px"} src={imgSource} />
+            <img width={"300px"} src={imageUrl} />
           </Box>
         </Container>
-        <Button fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          onClick={() => save()}
+          sx={{ mt: 3, mb: 2 }}
+        >
           Save
         </Button>
       </BasicModal>

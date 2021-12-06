@@ -11,6 +11,5 @@ export abstract class SessionStorageUtil {
 
   static clear(): void {
     this.storage.clear();
-    window.location.reload();
   }
 }
