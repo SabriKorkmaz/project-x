@@ -4,7 +4,7 @@ export interface ServiceModel extends BaseModel {
   name: string;
   description: string;
   title: string;
-  attendeeLimit: number;
+  capacity: number;
   duration: string;
   credit: number;
   imageUrl: string;

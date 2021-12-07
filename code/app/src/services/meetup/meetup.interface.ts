@@ -4,7 +4,7 @@ export interface MeetupModel extends BaseModel {
   name: string;
   description: string;
   title: string;
-  attendeeLimit: number;
+  capacity: number;
   duration: string;
   imageUrl: string;
   date: Date | null;

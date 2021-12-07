@@ -12,37 +12,39 @@ from shared.index import UPLOAD_FOLDER
 meetupRoute = Blueprint('meetup', __name__, )
 
 
-@meetupRoute.route('/meetups', methods=['GET'])
+@meetupRoute.route('/meetup/getAll/<id>', methods=['GET'])
 @token_required
-def get_all_meetups():
-    meetups = Meetup.query.all()
+def get_all_meetups(current_user, id):
+    print(id)
+    meetups = Meetup.query.filter_by(userId=id)
 
     data = []
 
     for meetup in meetups:
-        value = {'name': meetup.name, 'title': meetup.title, 'description': meetup.description,
-                 'duration': meetup.duration,
-                 'attendeeLimit': meetup.attendeeLimit, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+        value = {'imageUrl': meetup.imageUrl, 'title': meetup.title,"description":meetup.description,
+                 'address': meetup.address,
+                 'duration': meetup.duration,'userId': meetup.userId,
+                 'capacity': meetup.capacity,"id": meetup.id,
                  'date': meetup.date}
         data.append(value)
 
-    return jsonify({'meetups': data, "isSuccess": 1})
+    return jsonify({'data': data, "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/get/<id>', methods=['GET'])
 @token_required
-def get_one_meetup(id):
+def get_one_meetup(current_user,id):
     meetup = Meetup.query.filter_by(id=id).first()
 
     if not meetup:
         return jsonify({'message': 'No meetup found!', "isSuccess": 0})
 
-    value = {'name': meetup.name, 'title': meetup.title, 'description': meetup.description,
-             'duration': meetup.duration,
-             'attendeeLimit': meetup.attendeeLimit, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+    value = { 'title': meetup.title, 'description': meetup.description,
+             'duration': meetup.duration,"id": meetup.id,"userId":meetup.userId,
+             'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
              'date': meetup.date}
 
-    return jsonify({'meetup': value, "isSuccess": 1})
+    return jsonify({'data': value, "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/create', methods=['POST'])
@@ -51,14 +53,12 @@ def create_meetup(current_user):
     data = request.get_json()
     print(current_user.id)
     new_meetup = Meetup(
-        name=data['name'],
         title=data['title'],
         description=data['title'],
-        attendeeLimit=data['attendeeLimit'],
+        capacity=data['capacity'],
         duration=data['duration'],
         address=data['address'],
         imageUrl=data['imageUrl'],
-        credit=data['credit'],
         date=datetime.now(),
         userId=current_user.id,
         createddate=datetime.now()
@@ -69,33 +69,29 @@ def create_meetup(current_user):
     return jsonify({'message': 'New meetup created!', "isSuccess": 1})
 
 
-@meetupRoute.route('/meetup/edit/<id>', methods=['POST'])
+@meetupRoute.route('/meetup/update/<id>', methods=['POST'])
 @token_required
 def update_meetup(current_user,id):
     data = request.get_json()
 
     meetup: object = Meetup.query.filter_by(id=id).first()
 
-    meetup.name = data['name'],
     meetup.title = data['title'],
     meetup.description = data['title'],
-    meetup.attendeeLimit = data['attendeeLimit'],
+    meetup.capacity = data['capacity'],
     meetup.address = data['address'],
     meetup.imageUrl = data['imageUrl'],
-    meetup.date = data['date'],
+    meetup.date = datetime.now(),
     meetup.duration = data['duration'],
-    meetup.credit = data['credit'],
-    meetup.userId = current_user.id,
-    meetup.createddate = datetime.datetime.date()
 
     db.session.commit()
 
-    return jsonify({'message': 'New meetup created!', "isSuccess": 1})
+    return jsonify({'message': 'New meetup updated!', "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/delete/<id>', methods=['DELETE'])
 @token_required
-def delete_user(id):
+def delete_meetup(current_user, id):
     meetup = Meetup.query.filter_by(id=id).first()
 
     if not meetup:
@@ -104,7 +100,7 @@ def delete_user(id):
     db.session.delete(meetup)
     db.session.commit()
 
-    return jsonify({'message': 'The user has been deleted!', "isSuccess": 1})
+    return jsonify({'message': 'The meetup has been deleted!', "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/upload', methods=['POST', "GET"])

@@ -64,7 +64,7 @@ export abstract class BaseService {
     try {
       await this.initAxios();
       let response = await this.axios!.get(this.baseUrl + apiUrl, request);
-      return response.data;
+      return Promise.resolve<ReturnType>(response.data);
     } catch (error: any) {
       if (error.status === 401) {
         SessionStorageUtil.setItem(this.authToken, "");
@@ -81,6 +81,18 @@ export abstract class BaseService {
       console.log(url);
       await this.initAxios();
       let response = await this.axios!.post(this.baseUrl + url, request);
+      return response.data;
+    } catch (error: any) {
+      console.log("error:", error);
+      return error.data;
+    }
+  }
+
+  static async delete(request: any, url: string): Promise<ReturnType<any>> {
+    try {
+      console.log(url);
+      await this.initAxios();
+      let response = await this.axios!.delete(this.baseUrl + url, request);
       return response.data;
     } catch (error: any) {
       console.log("error:", error);

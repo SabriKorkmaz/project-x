@@ -10,17 +10,27 @@ export abstract class MeetupService {
 
   static async save(request: MeetupModel) {
     if (request.id) {
-      return await BaseService.postData(request, this.baseUrl + "update");
+      return await BaseService.postData(
+        request,
+        this.baseUrl + "update/" + request.id
+      );
     } else {
       return await BaseService.postData(request, this.baseUrl + "create");
     }
   }
 
   static async delete(id: number) {
-    return await BaseService.postData(id, this.baseUrl + "delete");
+    return await BaseService.delete(id, this.baseUrl + "delete/" + id);
   }
 
-  static async get(id: number) {
-    return await BaseService.getDataFromApi(id, this.baseUrl + "get");
+  static async get<T>(id: number) {
+    return await BaseService.getDataFromApi<T>(id, this.baseUrl + "get/" + id);
+  }
+
+  static async getAll<T>(userId: number) {
+    return await BaseService.getDataFromApi<T>(
+      undefined,
+      this.baseUrl + "getAll/" + userId
+    );
   }
 }

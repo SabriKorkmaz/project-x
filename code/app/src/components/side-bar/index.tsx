@@ -3,12 +3,12 @@ import { Box, Button, Card } from "@material-ui/core";
 import CssBaseline from "@mui/material/CssBaseline";
 import Avatar from "@mui/material/Avatar";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import CreateModal from "../create-modal";
 import { ModalType } from "../create-modal/modal-type.enum";
 import { SessionStorageUtil } from "../../utils/session-storage.util";
 import { ISideBar } from "./interface";
-import { Link } from "react-router-dom";
+import { ProcessType } from "../../utils/process-type.enum";
 
 export default function SideBar(props: ISideBar) {
   let navigate = useNavigate();
@@ -62,7 +62,7 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link to="/profile/meetups">
+          <Link to={`/profile/meetups?id=` + props.user.id}>
             <Button variant="outlined" size="large">
               My Meetps
             </Button>
@@ -72,8 +72,7 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link to="/profile/services">
-            {" "}
+          <Link to={`/profile/services?id=` + props.user.id}>
             <Button variant="outlined" size="large">
               My Services
             </Button>
@@ -83,13 +82,21 @@ export default function SideBar(props: ISideBar) {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <CreateModal userId={props.user.id} type={ModalType.Meetup} />
+          <CreateModal
+            userId={props.user.id}
+            type={ModalType.Meetup}
+            mode={ProcessType.Create}
+          />
         </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <CreateModal userId={props.user.id} type={ModalType.Service} />
+          <CreateModal
+            userId={props.user.id}
+            type={ModalType.Service}
+            mode={ProcessType.Create}
+          />
         </ListItem>
         <div style={{ display: props.user.admin ? "block" : "none" }}>
           <ListItem

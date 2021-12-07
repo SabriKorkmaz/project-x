@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import BasicModal from "../modal";
 import { ModalType } from "./modal-type.enum";
 import Box from "@mui/material/Box";
@@ -16,18 +16,29 @@ import { ServiceModel } from "../../services/service/service.interface";
 import { SnackbarContext } from "../../index";
 import { MeetupModel } from "../../services/meetup/meetup.interface";
 import { BaseService } from "../../services/base/base.service";
+import { ProcessType } from "../../utils/process-type.enum";
 
 export default function CreateModal(props: CreateModalProps) {
-  let ModalName = `Create ${
+  let ModalNameUpdate = props.mode == ProcessType.Create ? "Create" : "Edit";
+  let ModalName = `${ModalNameUpdate} ${
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
+
+  useEffect(() => {
+    if (props.mode === ProcessType.Update) {
+      console.log(props);
+      setInput(props.data);
+      setDate(props.data.date);
+      setImgSource(props.data.imageUrl);
+    }
+  }, [props.data]);
   let Adapter = AdapterDateFns as any;
   const [input, setInput] = useState({
     name: "",
     title: "",
-    attendeeLimit: 1,
+    capacity: 1,
     address: "",
     credit: 1,
     duration: "",
@@ -60,12 +71,9 @@ export default function CreateModal(props: CreateModalProps) {
     let result = null;
     if (props.type === ModalType.Service) {
       let service: ServiceModel = { ...input, date, imageUrl };
-      console.log(service);
       result = await ServiceService.save(service);
     } else if (props.type === ModalType.Meetup) {
       let meetup: MeetupModel = { ...input, date, imageUrl };
-      console.log(meetup);
-
       result = await MeetupService.save(meetup);
     }
     if (result) {
@@ -117,26 +125,6 @@ export default function CreateModal(props: CreateModalProps) {
             noValidate
             sx={{ mt: 1 }}
           >
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              value={input.name}
-              onChange={(e) => {
-                e.persist();
-
-                setInput((prevState) => ({
-                  ...prevState,
-                  name: e.target.value,
-                }));
-              }}
-              id="name"
-              variant="outlined"
-              label="Name"
-              name="name"
-              autoComplete="name"
-              autoFocus
-            />
             <TextField
               margin="normal"
               required
@@ -229,23 +217,23 @@ export default function CreateModal(props: CreateModalProps) {
               margin="normal"
               required
               fullWidth
-              value={input.attendeeLimit}
+              value={input.capacity}
               onChange={(e) => {
                 e.persist();
 
                 if (e.target.value) {
                   setInput((prevState) => ({
                     ...prevState,
-                    attendeeLimit: parseInt(e.target.value),
+                    capacity: parseInt(e.target.value),
                   }));
                 }
               }}
-              id="attendeeLimit"
+              id="capacity"
               variant="outlined"
               type="number"
-              label="Attendee limit"
-              name="attendeeLimit"
-              autoComplete="attendeeLimit"
+              label="Capacity"
+              name="capacity"
+              autoComplete="capacity"
               autoFocus
             />
             {creditInput()}
