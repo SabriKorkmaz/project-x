@@ -9,5 +9,6 @@ export interface ServiceModel extends BaseModel {
   credit: number;
   imageUrl: string;
   date: Date | null;
+  address: string;
   userId: number;
 }

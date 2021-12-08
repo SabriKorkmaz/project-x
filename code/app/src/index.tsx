@@ -21,6 +21,8 @@ import React from "react";
 import { AlertColor } from "@mui/material/Alert/Alert";
 import { Navigate } from "react-router-dom";
 import { UserModel } from "./services/user/user.inteface";
+import MeetupDetail from "./routes/meetup/detail";
+import ServiceDetail from "./routes/service/detail";
 
 export const SnackbarContext = createContext({});
 let isAuth = () => {
@@ -168,6 +170,22 @@ const AllRoute = observer(() => {
             <Header user={user} auth={auth}>
               <Recovery />
             </Header>
+          }
+        />
+        <Route
+          element={
+            <HeaderWithoutSearch auth={auth} user={user}>
+              <MeetupDetail auth={auth} user={user} />
+            </HeaderWithoutSearch>
+          }
+          path="/meetup/detail"
+        />
+        <Route
+          path="/service/detail"
+          element={
+            <HeaderWithoutSearch auth={auth} user={user}>
+              <ServiceDetail auth={auth} user={user} />
+            </HeaderWithoutSearch>
           }
         />
         <Route

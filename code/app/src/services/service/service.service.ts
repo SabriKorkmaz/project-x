@@ -1,10 +1,10 @@
 import { BaseService } from "../base/base.service";
-import { MeetupModel } from "../meetup/meetup.interface";
+import { ServiceModel } from "./service.interface";
 
 export abstract class ServiceService {
   private static readonly baseUrl = "service/";
 
-  static async save(request: MeetupModel) {
+  static async save(request: ServiceModel) {
     if (request.id) {
       return await BaseService.postData(
         request,

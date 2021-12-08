@@ -71,9 +71,11 @@ export default function CreateModal(props: CreateModalProps) {
     let result = null;
     if (props.type === ModalType.Service) {
       let service: ServiceModel = { ...input, date, imageUrl };
+      console.log(service);
       result = await ServiceService.save(service);
     } else if (props.type === ModalType.Meetup) {
       let meetup: MeetupModel = { ...input, date, imageUrl };
+      console.log(meetup);
       result = await MeetupService.save(meetup);
     }
     if (result) {
@@ -82,6 +84,9 @@ export default function CreateModal(props: CreateModalProps) {
         open: true,
         type: result.isSuccess ? "success" : "error",
       });
+      setInterval(() => {
+        window.location.reload();
+      }, 500);
     }
   };
   const creditInput = () => {

@@ -77,7 +77,7 @@ def update_meetup(current_user,id):
     meetup: object = Meetup.query.filter_by(id=id).first()
 
     meetup.title = data['title'],
-    meetup.description = data['title'],
+    meetup.description = data['description'],
     meetup.capacity = data['capacity'],
     meetup.address = data['address'],
     meetup.imageUrl = data['imageUrl'],

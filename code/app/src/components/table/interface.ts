@@ -4,7 +4,7 @@ export interface ITableList {
   showEditButton?: boolean;
   showDeleteButton?: boolean;
   data: ITable;
-  editModalType: ModalType;
+  type: ModalType;
 }
 
 export interface ITable {

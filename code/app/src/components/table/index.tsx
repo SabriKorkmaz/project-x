@@ -6,7 +6,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
 import { ITableList } from "./interface";
-import { useEffect, useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import CreateModal from "../create-modal";
 import { ProcessType } from "../../utils/process-type.enum";
 import Button from "@mui/material/Button";
@@ -14,11 +14,13 @@ import { ModalType } from "../create-modal/modal-type.enum";
 import { MeetupService } from "../../services/meetup/meetup.service";
 import { ServiceService } from "../../services/service/service.service";
 import { SnackbarContext } from "../../index";
-/*import MainStore from "../../stores/index";*/
+import MainStore from "../../stores/index";
+import { useNavigate } from "react-router-dom";
 
 export default function TableList(props: ITableList) {
   const [titles, setTitles] = useState([] as string[]);
   const [data, setData] = useState([] as any[]);
+  let navigate = useNavigate();
   //@ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   let bannedTitles = ["userId", "address", "description", "id"];
@@ -41,7 +43,9 @@ export default function TableList(props: ITableList) {
           </TableCell>
         );
       }
-      return <TableCell key={index + "asa"}>{data[index][key]}</TableCell>;
+      return (
+        <TableCell key={key + data[index][key]}>{data[index][key]}</TableCell>
+      );
     }
     return "";
   };
@@ -64,12 +68,22 @@ export default function TableList(props: ITableList) {
       <CreateModal
         userId={item.userId}
         data={item}
-        type={props.editModalType}
+        type={props.type}
         mode={ProcessType.Update}
       />
     ) : (
       ""
     );
+  };
+  let handleClick = (id: number) => {
+    if (props.type == ModalType.Service) {
+      MainStore.setActiveService(id);
+      navigate("/service/detail", { state: { id: id } });
+    } else if (props.type == ModalType.Meetup) {
+      navigate("/meetup/detail", { state: { id: id } });
+      MainStore.setActiveMeetup(id);
+    }
+    return undefined;
   };
 
   let deleteButton = (id: any) => {
@@ -78,7 +92,7 @@ export default function TableList(props: ITableList) {
         variant="outlined"
         onClick={async () => {
           let result = undefined;
-          if (props.editModalType === ModalType.Meetup) {
+          if (props.type === ModalType.Meetup) {
             result = await MeetupService.delete(id);
           } else {
             result = await ServiceService.delete(id);
@@ -111,17 +125,30 @@ export default function TableList(props: ITableList) {
             })}
             {editColumn()}
             {deleteColumn()}
+            <TableCell align="right">Detail</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {data?.map((item: any, dataIndex: number) => {
             return (
-              <TableRow key={dataIndex + "asa"} style={{ cursor: "pointer" }}>
+              <TableRow key={dataIndex + "asssa"} style={{ cursor: "pointer" }}>
                 {titles?.map((value: string, index: number) => {
                   return getItem(value, dataIndex);
                 })}
-                <TableCell align="right">{deleteButton(item.id)}</TableCell>
+
                 <TableCell align="right">{editButton(item)}</TableCell>
+                <TableCell align="right">{deleteButton(item.id)}</TableCell>
+                <TableCell align="right">
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={() => {
+                      handleClick(item.id);
+                    }}
+                  >
+                    Detail Meetup
+                  </Button>
+                </TableCell>
               </TableRow>
             );
           })}

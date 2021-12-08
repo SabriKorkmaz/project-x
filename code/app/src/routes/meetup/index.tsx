@@ -51,7 +51,7 @@ export const Meetups = () => {
         </Typography>
         <Divider variant="middle" style={{ margin: 0 }} />
         <TableList
-          editModalType={ModalType.Meetup}
+          type={ModalType.Meetup}
           showDeleteButton={true}
           showEditButton={true}
           data={meetups}

@@ -27,9 +27,9 @@ def get_all_services(current_user, id):
     return jsonify({'data': data, "isSuccess": 1})
 
 
-@serviceRoute.route('/service/<id>', methods=['GET'])
+@serviceRoute.route('/service/get/<id>', methods=['GET'])
 @token_required
-def get_one_service(id):
+def get_one_service(current_user,id):
     service = Service.query.filter_by(id=id).first()
 
     if not service:
@@ -40,7 +40,7 @@ def get_one_service(id):
              'duration': service.duration, "id":service.id,
              'date': service.date}
 
-    return jsonify({'service': value, "isSuccess": 1})
+    return jsonify({'data': value, "isSuccess": 1})
 
 
 @serviceRoute.route('/service/create', methods=['POST'])
@@ -50,7 +50,7 @@ def create_service(current_user):
 
     new_service = Service(
         title=data['title'],
-        description=data['title'],
+        description=data['description'],
         capacity=data['capacity'],
         address=data['address'],
         duration=data['duration'],
@@ -66,9 +66,9 @@ def create_service(current_user):
     return jsonify({'message': 'New service created!', "isSuccess": 1})
 
 
-@serviceRoute.route('/service/edit/<id>', methods=['POST'])
+@serviceRoute.route('/service/update/<id>', methods=['POST'])
 @token_required
-def update_service(id):
+def update_service(current_user,id):
     data = request.get_json()
 
     service: object = Service.query.filter_by(id=id).first()
@@ -77,7 +77,7 @@ def update_service(id):
     service.description = data['description'],
     service.capacity = data['capacity'],
     service.address = data['address'],
-    service.imageUrl = data['img'],
+    service.imageUrl = data['imageUrl'],
     service.date = datetime.now(),
     service.credit = data['credit'],
     service.duration = data['duration'],

@@ -51,7 +51,7 @@ export const Services = () => {
         </Typography>
         <Divider variant="middle" style={{ margin: 0 }} />
         <TableList
-          editModalType={ModalType.Service}
+          type={ModalType.Service}
           showDeleteButton={true}
           showEditButton={true}
           data={services}
