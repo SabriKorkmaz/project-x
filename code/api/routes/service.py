@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from models.index import Service
 from func.token import token_required
 from flask import request, jsonify
@@ -10,22 +10,21 @@ from models.index import db
 serviceRoute = Blueprint('service', __name__, )
 
 
-@serviceRoute.route('/services', methods=['GET'])
+@serviceRoute.route('/service/getAll/<id>', methods=['GET'])
 @token_required
-def get_all_services():
-    services = Service.query.all()
-
+def get_all_services(current_user, id):
+    services = Service.query.filter_by(userId=id)
     data = []
 
     for service in services:
-        value = {'name': service.name, 'title': service.title, 'description': service.description,
-                 "credit": service.credit,
-                 'attendeeLimit': service.attendeeLimit, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration,
+        value = {'title': service.title, 'description': service.description,
+                 "credit": service.credit,"userId": service.userId,
+                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                 'duration': service.duration, "id": service.id,
                  'date': service.date}
         data.append(value)
 
-    return jsonify({'services': data, "isSuccess": 1})
+    return jsonify({'data': data, "isSuccess": 1})
 
 
 @serviceRoute.route('/service/<id>', methods=['GET'])
@@ -36,9 +35,9 @@ def get_one_service(id):
     if not service:
         return jsonify({'message': 'No service found!', "isSuccess": 0})
 
-    value = {'name': service.name, 'title': service.title, 'description': service.description, 'credit': service.credit,
-             'attendeeLimit': service.attendeeLimit, 'address': service.address, 'imageUrl': service.imageUrl,
-             'duration': service.duration,
+    value = {'title': service.title, 'description': service.description, 'credit': service.credit,
+             'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+             'duration': service.duration, "id":service.id,
              'date': service.date}
 
     return jsonify({'service': value, "isSuccess": 1})
@@ -46,21 +45,20 @@ def get_one_service(id):
 
 @serviceRoute.route('/service/create', methods=['POST'])
 @token_required
-def create_service():
+def create_service(current_user):
     data = request.get_json()
 
     new_service = Service(
-        name=data['name'],
         title=data['title'],
         description=data['title'],
-        attendeeLimit=data['attendeeLimit'],
+        capacity=data['capacity'],
         address=data['address'],
         duration=data['duration'],
-        imageUrl=data['img'],
-        credit=data['creadit'],
-        date=data['date'],
-        userId=data['userId'],
-        createdDate=datetime.datetime
+        imageUrl=data['imageUrl'],
+        credit=data['credit'],
+        date=datetime.now(),
+        userId=current_user.id,
+        createdDate=datetime.now()
     )
     db.session.add(new_service)
     db.session.commit()
@@ -75,17 +73,15 @@ def update_service(id):
 
     service: object = Service.query.filter_by(id=id).first()
 
-    service.name = data['name'],
     service.title = data['title'],
-    service.description = data['title'],
-    service.attendeeLimit = data['attendeeLimit'],
+    service.description = data['description'],
+    service.capacity = data['capacity'],
     service.address = data['address'],
     service.imageUrl = data['img'],
-    service.date = data['date'],
+    service.date = datetime.now(),
     service.credit = data['credit'],
     service.duration = data['duration'],
     service.userId = data['userId'],
-    service.createddate = datetime.datetime
 
     db.session.commit()
 
@@ -94,7 +90,7 @@ def update_service(id):
 
 @serviceRoute.route('/service/delete/<id>', methods=['DELETE'])
 @token_required
-def delete_service(id):
+def delete_service(current_user, id):
     service = Service.query.filter_by(id=id).first()
 
     if not service:

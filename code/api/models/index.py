@@ -25,10 +25,9 @@ class User(db.Model):
 
 class Service(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=False)
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(420), unique=False)
-    attendeeLimit = db.Column(db.Integer, unique=False)
+    capacity = db.Column(db.Integer, unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120),unique=False)
     credit = db.Column(db.Integer, unique=False)
@@ -37,11 +36,10 @@ class Service(db.Model):
     userId = db.Column(db.Integer, unique=False)
     createdDate = db.Column(db.DateTime, unique=False)
 
-    def __init__(self, name, title, description,duration, attendeeLimit, credit, address, imageUrl, date, userId,createdDate):
-        self.name = name
+    def __init__(self,  title, description,duration, capacity, credit, address, imageUrl, date, userId,createdDate):
         self.title = title
         self.description = description
-        self.attendeeLimit = attendeeLimit
+        self.capacity = capacity
         self.credit = credit
         self.address = address
         self.imageUrl = imageUrl
@@ -53,10 +51,9 @@ class Service(db.Model):
 
 class Meetup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(120), unique=False)
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(420), unique=False)
-    attendeeLimit = db.Column(db.Integer, unique=False)
+    capacity = db.Column(db.Integer, unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
@@ -64,12 +61,10 @@ class Meetup(db.Model):
     userId = db.Column(db.Integer, unique=False)
     createdDate = db.Column(db.DateTime, unique=False)
 
-    def __init__(self, name, title, description,duration, attendeeLimit, credit, address, imageUrl, date, userId,createddate):
-        self.name = name
+    def __init__(self, title, description,duration, capacity, address, imageUrl, date, userId,createddate):
         self.title = title
         self.description = description
-        self.attendeeLimit = attendeeLimit
-        self.credit = credit
+        self.capacity = capacity
         self.duration = duration
         self.address = address
         self.imageUrl = imageUrl

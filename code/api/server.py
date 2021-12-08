@@ -4,6 +4,7 @@ import pymysql
 from flask import Flask
 from routes.user import userRoute
 from routes.meetups import meetupRoute
+from routes.service import serviceRoute
 from db.index import db
 app = Flask(__name__)
 
@@ -17,6 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:swe573573@localhos
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.register_blueprint(userRoute)
 app.register_blueprint(meetupRoute)
+app.register_blueprint(serviceRoute)
 
 pymysql.install_as_MySQLdb()
 db.init_app(app)
