@@ -51,10 +51,10 @@ jobs:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
         run: |
-          ls -ld
           echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{env.HOST_USER}}@${{env.HOST_NAME}} '
           
+            ls -ld
             docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
             docker rm -f $(docker ps -a -q)
             docker rmi $(docker images -a -q)
