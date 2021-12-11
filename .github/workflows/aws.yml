@@ -38,17 +38,17 @@ env:
   ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
   CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
+  PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
+  HOST_NAME : ${{ secrets.HOST_NAME  }}
+  HOST_USER : ${{ secrets.HOST_USER  }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
 jobs:
   push-docker:
     runs-on:  ubuntu-latest
     defaults:
       run:
         working-directory: ./code/app
-    strategy:
-      matrix:
-        node-version: [16.x]
     steps:
       - uses: actions/checkout@v1
       - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
@@ -56,26 +56,20 @@ jobs:
       - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
       - run: docker push sbrkrkmz/project-x:project-x-frontend
       
-  deploy:
+  connect-ec2:
     needs: push-docker
-    runs-on: ubuntu-latest
-    
+    runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
-        env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-            HOSTNAME : ${{ secrets.HOSTNAME  }}
-            USER_NAME : ${{ secrets.USER_NAME  }}
-            
         run: |
-          echo "$PRIVATE_KEY" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${HOST_USER}@${HOSTNAME} '
-          
-          docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
-          docker rm -f $(docker ps -a -q)
-          docker rmi $(docker images -a -q)
-          docker pull sbrkrkmz/project-x:project-x-frontend
-          docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
+          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-63-33-66-10.eu-west-1.compute.amazonaws.com '
+            ls -ld
+            docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
+            docker rm -f $(docker ps -a -q)
+            docker rmi $(docker images -a -q)
+            docker pull sbrkrkmz/project-x:project-x-frontend
+            docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
           '
   
