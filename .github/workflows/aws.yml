@@ -43,8 +43,21 @@ env:
   HOST_USER : ${{ secrets.HOST_USER  }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
-jobs:      
+jobs:
+  push-docker:
+    runs-on:  ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/app
+    steps:
+      - uses: actions/checkout@v1
+      - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
+      - run: docker build -t project-x-frontend .
+      - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
+      - run: docker push sbrkrkmz/project-x:project-x-frontend
+      
   connect-ec2:
+    needs: push-docker
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
