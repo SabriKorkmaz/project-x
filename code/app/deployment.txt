@@ -1,5 +1,5 @@
 //Github
-docker login
+docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
 docker build -t project-x-frontend .
 docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
 docker push sbrkrkmz/project-x:project-x-frontend
