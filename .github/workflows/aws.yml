@@ -41,7 +41,7 @@ env:
                                                # containerDefinitions section of your task definition
 
 jobs:
-  push-docker:
+  deploy-docker:
     runs-on:  ubuntu-latest
     defaults:
       run:
@@ -56,21 +56,15 @@ jobs:
       - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
       - run: docker push sbrkrkmz/project-x:project-x-frontend
       
-  deploy:
-    needs: push-docker
+  connect-ec2:
+    needs: deploy-docker
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
-        env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-            HOSTNAME : ${{ secrets.HOSTNAME  }}
-            USER_NAME : ${{ secrets.USER_NAME  }}
-            
         run: |
-          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${{env.HOST_USER}}@${{env.HOSTNAME}} '
+          echo "${{secrets.PRIVATE_KEY}}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{secrets.HOSTNAME}}@${{secrets.USER_NAME}} '
           
           docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
           docker rm -f $(docker ps -a -q)
