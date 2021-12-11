@@ -76,12 +76,12 @@ export abstract class BaseService {
     }
   }
 
-  static async postData(request: any, url: string): Promise<ReturnType<any>> {
+  static async postData<ReturnType>(request: any, url: string) {
     try {
       console.log(url);
       await this.initAxios();
       let response = await this.axios!.post(this.baseUrl + url, request);
-      return response.data;
+      return Promise.resolve<ReturnType>(response.data);
     } catch (error: any) {
       console.log("error:", error);
       return error.data;

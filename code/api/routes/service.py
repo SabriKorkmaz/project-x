@@ -109,3 +109,5 @@ def upload_file():
         f = request.files['file']
         f.save(secure_filename(f.filename))
         return jsonify({'message': 'File successfully uploaded!', "isSuccess": 1})
+
+

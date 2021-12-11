@@ -9,8 +9,11 @@ import { ModalType } from "../create-modal/modal-type.enum";
 import { SessionStorageUtil } from "../../utils/session-storage.util";
 import { ISideBar } from "./interface";
 import { ProcessType } from "../../utils/process-type.enum";
+import { useEffect } from "react";
+import MainStore from "../../stores";
+import { observer } from "mobx-react";
 
-export default function SideBar(props: ISideBar) {
+export const SideBar = observer((props: ISideBar) => {
   let navigate = useNavigate();
   const userName = () => {
     if (props.user.name) {
@@ -18,6 +21,18 @@ export default function SideBar(props: ISideBar) {
     }
     return;
   };
+
+  useEffect(() => {
+    console.log("user");
+    console.log(props.user);
+  }, [props.user]);
+  const credit = () => {
+    if (MainStore.getUser()) {
+      return <h6>{`Credit: ${MainStore.getUser().credit}`}</h6>;
+    }
+    return;
+  };
+
   return (
     <Card
       component="main"
@@ -47,6 +62,9 @@ export default function SideBar(props: ISideBar) {
         </ListItem>
         <ListItem style={{ display: "flex", justifyContent: "center" }}>
           {userName()}
+        </ListItem>
+        <ListItem style={{ display: "flex", justifyContent: "center" }}>
+          {credit()}
         </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
@@ -85,6 +103,7 @@ export default function SideBar(props: ISideBar) {
           <CreateModal
             userId={props.user.id}
             type={ModalType.Meetup}
+            buttonName="Create Meetup"
             mode={ProcessType.Create}
           />
         </ListItem>
@@ -93,6 +112,7 @@ export default function SideBar(props: ISideBar) {
           alignItems="center"
         >
           <CreateModal
+            buttonName="Create Service"
             userId={props.user.id}
             type={ModalType.Service}
             mode={ProcessType.Create}
@@ -138,4 +158,4 @@ export default function SideBar(props: ISideBar) {
       </Box>
     </Card>
   );
-}
+});

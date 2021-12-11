@@ -17,6 +17,7 @@ import { SnackbarContext } from "../../index";
 import { MeetupModel } from "../../services/meetup/meetup.interface";
 import { BaseService } from "../../services/base/base.service";
 import { ProcessType } from "../../utils/process-type.enum";
+import MainStore from "../../stores/index";
 
 export default function CreateModal(props: CreateModalProps) {
   let ModalNameUpdate = props.mode == ProcessType.Create ? "Create" : "Edit";
@@ -78,6 +79,7 @@ export default function CreateModal(props: CreateModalProps) {
       console.log(meetup);
       result = await MeetupService.save(meetup);
     }
+    await MainStore.updateUser();
     if (result) {
       setSnack({
         message: result.message,
@@ -121,7 +123,7 @@ export default function CreateModal(props: CreateModalProps) {
 
   return (
     <React.Fragment>
-      <BasicModal buttonName={ModalName} width="80%">
+      <BasicModal buttonName={props.buttonName} width="80%">
         <h2>{ModalName}</h2>
         <Container style={{ display: "flex", flexDirection: "row" }}>
           <Box

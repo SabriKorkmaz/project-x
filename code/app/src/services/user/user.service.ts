@@ -12,4 +12,64 @@ export abstract class UserService {
   static async create(request: Partial<UserModel>) {
     return await BaseService.postData(request, this.baseUrl + "create");
   }
+
+  static async getUser<T>(id: number) {
+    return await BaseService.getDataFromApi<T>(id, this.baseUrl + "get/" + id);
+  }
+
+  static async registerMeetup<T>(request: any) {
+    return await BaseService.postData<T>(
+      request,
+      this.baseUrl + "registerMeetup"
+    );
+  }
+
+  static async getMeetupAttendees<T>(id: any) {
+    return await BaseService.getDataFromApi<T>(
+      id,
+      this.baseUrl + "getMeetupAttendees/" + id
+    );
+  }
+
+  static async deleteRegisteredMeetup(id: any) {
+    return await BaseService.delete(
+      id,
+      this.baseUrl + "deleteRegisteredMeetup/" + id
+    );
+  }
+
+  static async acceptRegisteredMeetup<T>(id: any) {
+    return await BaseService.postData<T>(
+      id,
+      this.baseUrl + "acceptRegisteredMeetup/" + id
+    );
+  }
+
+  static async registerService<T>(request: any) {
+    return await BaseService.postData<T>(
+      request,
+      this.baseUrl + "registerService"
+    );
+  }
+
+  static async getServiceAttendees<T>(id: any) {
+    return await BaseService.getDataFromApi<T>(
+      id,
+      this.baseUrl + "getServiceAttendees/" + id
+    );
+  }
+
+  static async deleteRegisteredService(id: any) {
+    return await BaseService.delete(
+      id,
+      this.baseUrl + "deleteRegisteredService/" + id
+    );
+  }
+
+  static async acceptRegisteredService<T>(id: any) {
+    return await BaseService.postData<T>(
+      id,
+      this.baseUrl + "acceptRegisteredService/" + id
+    );
+  }
 }

@@ -3,7 +3,7 @@ from flask_cors import CORS
 import pymysql
 from flask import Flask
 from routes.user import userRoute
-from routes.meetups import meetupRoute
+from routes.meetup import meetupRoute
 from routes.service import serviceRoute
 from db.index import db
 app = Flask(__name__)

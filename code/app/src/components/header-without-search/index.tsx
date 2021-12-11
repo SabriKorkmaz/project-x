@@ -1,11 +1,15 @@
 import { Box, Container } from "@material-ui/core";
 import { Logo } from "../../components/logo";
 import Auth from "../../components/auth";
-import React from "react";
+import React, { useEffect } from "react";
 import { IHeader } from "../header/interface";
-import SideBar from "../side-bar";
+import { SideBar } from "../side-bar";
 
 export default function HeaderWithoutSearch(props: IHeader) {
+  useEffect(() => {
+    console.log("user");
+    console.log(props.user);
+  }, [props.user]);
   return (
     <React.Fragment>
       <Container maxWidth="xl" style={{ paddingTop: "100px" }}>

@@ -1,6 +1,6 @@
 from datetime import datetime
 import os
-from models.index import Meetup
+from models.index import Meetup, UserMeetup
 from func.token import token_required
 from flask import request, jsonify, url_for
 from werkzeug.utils import secure_filename
@@ -47,6 +47,20 @@ def get_one_meetup(current_user,id):
     return jsonify({'data': value, "isSuccess": 1})
 
 
+@meetupRoute.route('/meetup/delete/<id>', methods=['DELETE'])
+@token_required
+def delete_meetup(current_user, id):
+    meetup = Meetup.query.filter_by(id=id).first()
+
+    if not meetup:
+        return jsonify({'message': 'No meetup found!', "isSuccess": 0})
+
+    db.session.delete(meetup)
+    db.session.commit()
+
+    return jsonify({'message': 'The meetup has been deleted!', "isSuccess": 1})
+
+
 @meetupRoute.route('/meetup/create', methods=['POST'])
 @token_required
 def create_meetup(current_user):
@@ -89,18 +103,6 @@ def update_meetup(current_user,id):
     return jsonify({'message': 'New meetup updated!', "isSuccess": 1})
 
 
-@meetupRoute.route('/meetup/delete/<id>', methods=['DELETE'])
-@token_required
-def delete_meetup(current_user, id):
-    meetup = Meetup.query.filter_by(id=id).first()
-
-    if not meetup:
-        return jsonify({'message': 'No user found!', "isSuccess": 0})
-
-    db.session.delete(meetup)
-    db.session.commit()
-
-    return jsonify({'message': 'The meetup has been deleted!', "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/upload', methods=['POST', "GET"])

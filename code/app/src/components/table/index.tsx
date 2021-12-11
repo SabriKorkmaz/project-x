@@ -68,6 +68,7 @@ export default function TableList(props: ITableList) {
       <CreateModal
         userId={item.userId}
         data={item}
+        buttonName={"Edit"}
         type={props.type}
         mode={ProcessType.Update}
       />
@@ -90,6 +91,7 @@ export default function TableList(props: ITableList) {
     return props.showEditButton ? (
       <Button
         variant="outlined"
+        color="error"
         onClick={async () => {
           let result = undefined;
           if (props.type === ModalType.Meetup) {
@@ -108,7 +110,7 @@ export default function TableList(props: ITableList) {
         }}
         size="large"
       >
-        Delete Meetup
+        Delete
       </Button>
     ) : (
       ""
@@ -123,8 +125,9 @@ export default function TableList(props: ITableList) {
             {titles?.map((item: string, index: number) => {
               return <TableCell key={index}>{item.toUpperCase()}</TableCell>;
             })}
-            {editColumn()}
             {deleteColumn()}
+
+            {editColumn()}
             <TableCell align="right">Detail</TableCell>
           </TableRow>
         </TableHead>
@@ -135,9 +138,9 @@ export default function TableList(props: ITableList) {
                 {titles?.map((value: string, index: number) => {
                   return getItem(value, dataIndex);
                 })}
+                <TableCell align="right">{deleteButton(item.id)}</TableCell>
 
                 <TableCell align="right">{editButton(item)}</TableCell>
-                <TableCell align="right">{deleteButton(item.id)}</TableCell>
                 <TableCell align="right">
                   <Button
                     variant="outlined"
@@ -146,7 +149,7 @@ export default function TableList(props: ITableList) {
                       handleClick(item.id);
                     }}
                   >
-                    Detail Meetup
+                    Detail
                   </Button>
                 </TableCell>
               </TableRow>

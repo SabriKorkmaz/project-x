@@ -143,6 +143,7 @@ const AllRoute = observer(() => {
       setUser(user);
     }
     MainStore.setAuth(auth);
+    MainStore.setUser(user);
   }, []);
 
   return (

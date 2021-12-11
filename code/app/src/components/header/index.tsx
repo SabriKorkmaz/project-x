@@ -4,8 +4,8 @@ import { Search } from "../../components/search-bar";
 import Auth from "../../components/auth";
 import React from "react";
 import { IHeader } from "./interface";
-import SideBar from "../side-bar";
-/*import SideBar from "../side-bar"*/
+import { SideBar } from "../side-bar";
+
 export default function Header(props: IHeader) {
   return (
     <React.Fragment>

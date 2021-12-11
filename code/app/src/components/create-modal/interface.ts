@@ -6,4 +6,5 @@ export interface CreateModalProps {
   userId: number;
   mode?: ProcessType;
   data?: any;
+  buttonName: string;
 }

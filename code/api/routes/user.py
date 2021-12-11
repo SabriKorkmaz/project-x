@@ -2,6 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from models.index import User
+from models.index import UserMeetup,UserService
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
@@ -34,11 +35,9 @@ def get_all_users(current_user):
     return jsonify({'users': output})
 
 
-@userRoute.route('/user/<id>', methods=['GET'])
+@userRoute.route('/user/get/<id>', methods=['GET'])
 @token_required
 def get_one_user(current_user, id):
-    if not current_user.admin:
-        return jsonify({'message': 'Cannot perform that function!'})
 
     user = User.query.filter_by(id=id).first()
 
@@ -48,10 +47,33 @@ def get_one_user(current_user, id):
     user_data = {}
     user_data['id'] = user.id
     user_data['name'] = user.name
-    user_data['password'] = user.password
+    user_data['credit'] = user.credit
     user_data['admin'] = user.admin
 
-    return jsonify({'user': user_data})
+    meetups = []
+
+    for meetup in user.meetups:
+        value = {'title': meetup.title, 'description': meetup.description,
+                 "userId": meetup.userId,
+                 'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+                 'duration': meetup.duration, "id": meetup.id,
+                 'date': meetup.date}
+        meetups.append(value)
+    user_data['meetups'] = meetups
+
+    services = []
+
+    for service in user.services:
+        value = {'title': service.title, 'description': service.description,
+                 "credit": service.credit, "userId": service.userId,
+                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                 'duration': service.duration, "id": service.id,
+                 'date': service.date}
+        services.append(value)
+
+    user_data['services'] = services
+
+    return jsonify({'data': user_data,"isSuccess":1})
 
 
 @userRoute.route('/user/create', methods=['POST'])
@@ -128,6 +150,185 @@ def login():
         user_data['id'] = user.id
         user_data['name'] = user.name
         user_data['admin'] = user.admin
+        user_data['credit'] = user.credit
+
+        meetups = []
+
+        for meetup in user.meetups:
+            value = {'title': meetup.title, 'description': meetup.description,
+                     "userId": meetup.userId,
+                     'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+                     'duration': meetup.duration, "id": meetup.id,
+                     'date': meetup.date}
+            meetups.append(value)
+        user_data['meetups'] = meetups
+
+        services = []
+
+        for service in user.services:
+            value = {'title': service.title, 'description': service.description,
+                     "credit": service.credit, "userId": service.userId,
+                     'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                     'duration': service.duration, "id": service.id,
+                     'date': service.date}
+            services.append(value)
+
+        user_data['services'] = services
         return jsonify({'token': token.decode('UTF-8'), "isSuccess": 1,"message":"Login successful","user":user_data})
 
     return make_response(jsonify({"message": "Could not verify2", "isSuccess": 0}), 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+
+@userRoute.route('/user/deleteRegisteredMeetup/<id>', methods=['DELETE'])
+@token_required
+def delete_user_meetup(current_user, id):
+
+    userMeetup = UserMeetup.query.filter_by(id=id).first()
+
+    if not userMeetup:
+        return jsonify({'message': 'No userMeetup found!'})
+
+    db.session.delete(userMeetup)
+    db.session.commit()
+
+    return jsonify({'message': 'The userMeetup has been deleted!',"isSuccess":1})
+
+
+@userRoute.route('/user/registerMeetup', methods=['POST'])
+@token_required
+def save_user_meetup(current_user):
+    data = request.get_json()
+    print(current_user.id)
+    user_meetup = UserMeetup(
+        userId=data['userId'],
+        meetupId=data['meetupId'],
+        status=0,
+        createdDate=datetime.datetime.now(),
+    )
+    db.session.add(user_meetup)
+    db.session.commit()
+
+    return jsonify({"isSuccess": 1, 'message': 'New appointment created!'})
+
+
+@userRoute.route('/user/getRegisteredMeetup/<id>', methods=['GET'])
+@token_required
+def get_registered_meetup(current_user,id):
+        userMeetup = UserMeetup.query.filter_by(userId=id)
+        data = []
+
+        for usermeetup in userMeetup:
+            value = {'status': usermeetup.status,
+                     "userId": usermeetup.userId,
+                     "id": usermeetup.id,
+                     "name": usermeetup.user.name,
+                     "surname": usermeetup.user.surname,
+                     'meetupId': usermeetup.meetupId}
+            data.append(value)
+
+        return jsonify({'data': data, "isSuccess": 1})
+
+
+@userRoute.route('/user/getMeetupAttendees/<id>', methods=['GET'])
+@token_required
+def get_meetup_attendees(current_user,id):
+        userMeetup = UserMeetup.query.filter_by(meetupId=id)
+        data = []
+
+        for usermeetup in userMeetup:
+            value = {'status': usermeetup.status,
+                     "userId": usermeetup.userId,
+                     "id": usermeetup.id,
+                     "name": usermeetup.user.name,
+                     "surname": usermeetup.user.surname,
+                     'meetupId': usermeetup.meetupId}
+            data.append(value)
+
+        return jsonify({'data': data, "isSuccess": 1})
+
+
+@userRoute.route('/user/acceptRegisteredMeetup/<id>', methods=['POST'])
+@token_required
+def update_meetup(current_user,id):
+    data = request.get_json()
+
+    meetup: object = UserMeetup.query.filter_by(id=id).first()
+
+    meetup.status = True
+
+    db.session.commit()
+
+    return jsonify({'message': 'Meetup request is accepted!', "isSuccess": 1})
+
+
+@userRoute.route('/user/registerService', methods=['POST'])
+@token_required
+def save_user_service(current_user):
+    data = request.get_json()
+    user_service = UserService(
+        userId=data['userId'],
+        serviceId=data['serviceId'],
+        credit=data['credit'],
+        status=False,
+        createdDate=datetime.datetime.now(),
+    )
+    user = User.query.filter_by(id=data['userId']).first()
+    user.credit = user.credit - data['credit']
+
+    db.session.add(user_service)
+    db.session.commit()
+
+    return jsonify({"isSuccess": 1, 'message': 'New service request is created!'})
+
+
+@userRoute.route('/user/deleteRegisteredService/<id>', methods=['DELETE'])
+@token_required
+def delete_user_service(current_user, id):
+
+    userService = UserService.query.filter_by(id=id).first()
+
+    user = User.query.filter_by(id=userService.userId).first()
+
+    user.credit = user.credit + userService.credit
+
+    if not userService:
+        return jsonify({'message': 'No userService found!'})
+
+    db.session.delete(userService)
+    db.session.commit()
+
+    return jsonify({'message': 'The userService has been deleted!', "isSuccess": 1})
+
+
+@userRoute.route('/user/getServiceAttendees/<id>', methods=['GET'])
+@token_required
+def get_service_attendees(current_user,id):
+        userService = UserService.query.filter_by(serviceId=id)
+        data = []
+
+        for userservice in userService:
+            value = {'status': userservice.status,
+                     "userId": userservice.userId,
+                     "id": userservice.id,
+                     "name": userservice.user.name,
+                     "surname": userservice.user.name,
+                     'serviceId': userservice.serviceId}
+            data.append(value)
+
+        return jsonify({'data': data, "isSuccess": 1})
+
+
+@userRoute.route('/user/acceptRegisteredService/<id>', methods=['POST'])
+@token_required
+def update_service(current_user,id):
+    data = request.get_json()
+
+    userservice: object = UserService.query.filter_by(id=id).first()
+
+    userservice.status = True
+
+    db.session.commit()
+
+    return jsonify({'message': 'Service request is accepted!', "isSuccess": 1})
+
+

@@ -1,5 +1,8 @@
 import { action, computed, observable } from "mobx";
+import { ResponseModel } from "../services/base/response.interface";
 import { UserModel } from "../services/user/user.inteface";
+import { UserService } from "../services/user/user.service";
+import { SessionStorageUtil } from "../utils/session-storage.util";
 
 //import { toJS } from "mobx";
 class MainStore {
@@ -17,6 +20,15 @@ class MainStore {
   @action
   setActiveService(id: number) {
     this.activeServiceId = id;
+  }
+
+  @action
+  async updateUser() {
+    let result = await UserService.getUser<ResponseModel<UserModel>>(
+      this.user.id!
+    );
+    this.user = result.data;
+    await SessionStorageUtil.setItem("user", JSON.stringify(this.user));
   }
 
   @action
