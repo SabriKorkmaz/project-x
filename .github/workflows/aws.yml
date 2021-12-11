@@ -40,33 +40,23 @@ env:
   CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
-jobs:
-  deploy-docker:
-    runs-on:  ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./code/app
-    strategy:
-      matrix:
-        node-version: [16.x]
-    steps:
-      - uses: actions/checkout@v1
-      - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
-      - run: docker build -t project-x-frontend .
-      - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
-      - run: docker push sbrkrkmz/project-x:project-x-frontend
-      
+jobs:      
   connect-ec2:
-    needs: deploy-docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
+        env:
+            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
+            HOST_NAME : ${{ secrets.HOST_NAME  }}
+            USER_NAME : ${{ secrets.USER  }}
+            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
+            DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
         run: |
-          echo "${{secrets.PRIVATE_KEY}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${{secrets.HOSTNAME}}@${{secrets.USER_NAME}} '
+          echo "${PRIVATE_KEY}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${HOSTNAME}@${USER_NAME}} '
           
-          docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
+          docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
           docker rm -f $(docker ps -a -q)
           docker rmi $(docker images -a -q)
           docker pull sbrkrkmz/project-x:project-x-frontend
