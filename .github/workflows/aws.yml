@@ -38,25 +38,23 @@ env:
   ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
   ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
   CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
+  PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
+  HOST_NAME : ${{ secrets.HOST_NAME  }}
+  HOST_USER : ${{ secrets.HOST_USER  }}
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
+  DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
+  
 jobs:      
   connect-ec2:
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
-        env:
-            PRIVATE_KEY: ${{ secrets.AWS_PRIVATE_KEY  }}
-            HOST_NAME : ${{ secrets.HOST_NAME  }}
-            USER_NAME : ${{ secrets.USER  }}
-            DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
-            DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
         run: |
-          echo "${PRIVATE_KEY}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ${HOSTNAME}@${USER_NAME}} '
+          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ${{env.HOST_USER}}@${{env.HOST_NAME}} '
           
-          docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+          docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
           docker rm -f $(docker ps -a -q)
           docker rmi $(docker images -a -q)
           docker pull sbrkrkmz/project-x:project-x-frontend
