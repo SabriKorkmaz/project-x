@@ -43,7 +43,6 @@ env:
   HOST_USER : ${{ secrets.HOST_USER  }}
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
-  
 jobs:      
   connect-ec2:
     runs-on: ubuntu-latest    
@@ -53,7 +52,6 @@ jobs:
         run: |
           echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-63-33-66-10.eu-west-1.compute.amazonaws.com '
-          
             ls -ld
             docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
             docker rm -f $(docker ps -a -q)
