@@ -52,13 +52,13 @@ jobs:
       - name: Deploy in EC2
         run: |
           ls -ld
-          echo "${{env.PRIVATE_KEY}}" > private_key && sudo chmod 600 private_key
+          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ${{env.HOST_USER}}@${{env.HOST_NAME}} '
           
-          docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
-          docker rm -f $(docker ps -a -q)
-          docker rmi $(docker images -a -q)
-          docker pull sbrkrkmz/project-x:project-x-frontend
-          docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
+            docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
+            docker rm -f $(docker ps -a -q)
+            docker rmi $(docker images -a -q)
+            docker pull sbrkrkmz/project-x:project-x-frontend
+            docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
           '
   
