@@ -4,7 +4,8 @@ import { LoginModel } from "../user/login.inteface";
 import { ResponseModel } from "./response.interface";
 
 export abstract class BaseService {
-  public static readonly baseUrl = "http://localhost:4444/";
+  public static readonly baseUrl =
+    "http://ec2-63-33-66-10.eu-west-1.compute.amazonaws.com:5555/";
   private static axios?: AxiosInstance;
   private static readonly authToken: string = "x-access-token";
 

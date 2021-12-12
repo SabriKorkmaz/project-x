@@ -14,7 +14,7 @@ app.add_url_rule(
 )
 CORS(app)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:swe573573@localhost/ProjectX'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@db/ProjectX'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.register_blueprint(userRoute)
 app.register_blueprint(meetupRoute)
@@ -33,5 +33,4 @@ def main():
 
 
 if __name__=="__main__":
-    app.run(host=os.getenv('IP', '0.0.0.0'),
-            port=int(os.getenv('PORT', 4444)))
+    app.run(host='0.0.0.0',port=5555)
