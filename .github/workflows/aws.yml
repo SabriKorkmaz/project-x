@@ -56,6 +56,7 @@ jobs:
       - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
       - run: docker push sbrkrkmz/project-x:project-x-frontend
   backend-push-docker:
+    needs: frontend-push-docker
     runs-on:  ubuntu-latest
     defaults:
       run:
@@ -66,7 +67,7 @@ jobs:
       - run: docker-compose up
       - run: docker-compose push
   connect-ec2:
-    needs: push-docker
+    needs: backend-push-docker
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
