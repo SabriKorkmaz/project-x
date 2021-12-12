@@ -70,7 +70,7 @@ jobs:
             docker rmi $(docker images -a -q)
             docker pull sbrkrkmz/project-x:project-x-frontend
             docker pull sbrkrkmz/project-x-api
-            docker run -dp 5555:5555 --name project-x-api sbrkrkmz/project-api
+            docker run -dp 5555:5555 --name project-x-api sbrkrkmz/project-x-api
             docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
           '
   
