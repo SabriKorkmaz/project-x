@@ -44,7 +44,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME  }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD  }}
 jobs:
-  push-docker:
+  frontend-push-docker:
     runs-on:  ubuntu-latest
     defaults:
       run:
@@ -55,7 +55,16 @@ jobs:
       - run: docker build -t project-x-frontend .
       - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
       - run: docker push sbrkrkmz/project-x:project-x-frontend
-      
+  backend-push-docker:
+    runs-on:  ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/api
+    steps:
+      - uses: actions/checkout@v1
+      - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
+      - run: docker-compose up
+      - run: docker-compose push
   connect-ec2:
     needs: push-docker
     runs-on: ubuntu-latest    
@@ -70,6 +79,8 @@ jobs:
             docker rm -f $(docker ps -a -q)
             docker rmi $(docker images -a -q)
             docker pull sbrkrkmz/project-x:project-x-frontend
+            docker pull sbrkrkmz/project-x-api
+            docker run -dp 5555:5555 --name project-x-api sbrkrkmz/project-api
             docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
           '
   
