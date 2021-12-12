@@ -3,16 +3,34 @@ docker login -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
 docker build -t project-x-frontend .
 docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
 docker push sbrkrkmz/project-x:project-x-frontend
-
+docker-compose up
+docker-compose push
 
 //AWS
 docker login
 docker rm -f $(docker ps -a -q)
 docker rmi $(docker images -a -q)
 docker pull sbrkrkmz/project-x:project-x-frontend
+docker pull sbrkrkmz/project-x-api
+
 docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
+docker run -dp 5555:5555 --name project-x-api sbrkrkmz/project-api
+
 
 sudo yum update
 sudo yum install docker
 sudo systemctl start docker
 sudo chmod 666 /var/run/docker.sock
+
+
+  frontend-push-docker:
+    runs-on:  ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./code/app
+    steps:
+      - uses: actions/checkout@v1
+      - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
+      - run: docker build -t project-x-frontend .
+      - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
+      - run: docker push sbrkrkmz/project-x:project-x-frontend
