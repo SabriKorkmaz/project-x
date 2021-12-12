@@ -53,7 +53,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
-      - run: docker-compose up
       - run: docker-compose push
   connect-ec2:
     needs: backend-push-docker
