@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime,timezone
 import os
 from models.index import Meetup, UserMeetup
 from func.token import token_required
@@ -10,6 +10,23 @@ from models.index import db
 from shared.index import UPLOAD_FOLDER
 
 meetupRoute = Blueprint('meetup', __name__, )
+
+
+@meetupRoute.route('/meetup/latest', methods=['GET'])
+def get_latest():
+    meetups = db.session.query(Meetup).order_by(Meetup.id.desc()).limit(3)
+
+    data = []
+
+    for meetup in meetups:
+        value = {'imageUrl': meetup.imageUrl, 'title': meetup.title,"description":meetup.description,
+                 'address': meetup.address,
+                 'duration': meetup.duration,'userId': meetup.userId,
+                 'capacity': meetup.capacity,"id": meetup.id,
+                 'date': meetup.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})
 
 
 @meetupRoute.route('/meetup/getAll/<id>', methods=['GET'])
@@ -32,8 +49,7 @@ def get_all_meetups(current_user, id):
 
 
 @meetupRoute.route('/meetup/get/<id>', methods=['GET'])
-@token_required
-def get_one_meetup(current_user,id):
+def get_one_meetup(id):
     meetup = Meetup.query.filter_by(id=id).first()
 
     if not meetup:
@@ -68,12 +84,12 @@ def create_meetup(current_user):
     print(current_user.id)
     new_meetup = Meetup(
         title=data['title'],
-        description=data['title'],
+        description=data['description'],
         capacity=data['capacity'],
         duration=data['duration'],
         address=data['address'],
         imageUrl=data['imageUrl'],
-        date=datetime.now(),
+        date=data['date'],
         userId=current_user.id,
         createddate=datetime.now()
     )
@@ -95,12 +111,12 @@ def update_meetup(current_user,id):
     meetup.capacity = data['capacity'],
     meetup.address = data['address'],
     meetup.imageUrl = data['imageUrl'],
-    meetup.date = datetime.now(),
+    meetup.date = data['date'],
     meetup.duration = data['duration'],
 
     db.session.commit()
 
-    return jsonify({'message': 'New meetup updated!', "isSuccess": 1})
+    return jsonify({'message': 'Meetup updated!', "isSuccess": 1})
 
 
 

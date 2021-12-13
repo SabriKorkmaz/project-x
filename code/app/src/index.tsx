@@ -23,6 +23,7 @@ import { Navigate } from "react-router-dom";
 import { UserModel } from "./services/user/user.inteface";
 import MeetupDetail from "./routes/meetup/detail";
 import ServiceDetail from "./routes/service/detail";
+import { ModalType } from "./components/create-modal/modal-type.enum";
 
 export const SnackbarContext = createContext({});
 let isAuth = () => {
@@ -153,7 +154,8 @@ const AllRoute = observer(() => {
           path="/"
           element={
             <Header user={user} auth={auth}>
-              <Latest />
+              <Latest type={ModalType.Service} name="Service" />
+              <Latest type={ModalType.Meetup} name="Meetup" />
             </Header>
           }
         />

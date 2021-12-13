@@ -13,8 +13,8 @@ app.add_url_rule(
     "/uploads/<name>", endpoint="download_file", build_only=True
 )
 CORS(app)
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/ProjectX'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@db/ProjectX'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/ProjectX'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@db/ProjectX'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.register_blueprint(userRoute)
 app.register_blueprint(meetupRoute)

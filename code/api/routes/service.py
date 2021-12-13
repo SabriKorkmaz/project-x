@@ -10,6 +10,22 @@ from models.index import db
 serviceRoute = Blueprint('service', __name__, )
 
 
+@serviceRoute.route('/service/latest', methods=['GET'])
+def get_latest():
+    services =db.session.query(Service).order_by(Service.id.desc()).limit(3)
+    data = []
+
+    for service in services:
+        value = {'title': service.title, 'description': service.description,
+                 "credit": service.credit,"userId": service.userId,
+                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                 'duration': service.duration, "id": service.id,
+                 'date': service.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})
+
+
 @serviceRoute.route('/service/getAll/<id>', methods=['GET'])
 @token_required
 def get_all_services(current_user, id):
@@ -28,8 +44,7 @@ def get_all_services(current_user, id):
 
 
 @serviceRoute.route('/service/get/<id>', methods=['GET'])
-@token_required
-def get_one_service(current_user,id):
+def get_one_service(id):
     service = Service.query.filter_by(id=id).first()
 
     if not service:
@@ -56,7 +71,7 @@ def create_service(current_user):
         duration=data['duration'],
         imageUrl=data['imageUrl'],
         credit=data['credit'],
-        date=datetime.now(),
+        date=data['date'],
         userId=current_user.id,
         createdDate=datetime.now()
     )
@@ -78,7 +93,7 @@ def update_service(current_user,id):
     service.capacity = data['capacity'],
     service.address = data['address'],
     service.imageUrl = data['imageUrl'],
-    service.date = datetime.now(),
+    service.date = data['date'],
     service.credit = data['credit'],
     service.duration = data['duration'],
     service.userId = data['userId'],

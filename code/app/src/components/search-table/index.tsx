@@ -16,10 +16,12 @@ export default function SearchTable(props: ITableList) {
   const [titles, setTitles] = useState([] as string[]);
   const [data, setData] = useState([] as any[]);
   let navigate = useNavigate();
-  let bannedTitles = ["userId", "address", "description", "id"];
+  let bannedTitles = ["userId", "address", "description", "id", "type"];
   useEffect(() => {
     if (props.data) {
+      console.log(props.data);
       setData(props.data.data);
+
       setTitles(
         props.data.title?.reverse().filter((k) => !bannedTitles.includes(k))
       );
@@ -72,15 +74,18 @@ export default function SearchTable(props: ITableList) {
                 {titles?.map((value: string, index: number) => {
                   return getItem(value, dataIndex);
                 })}
-                <Button
-                  variant="outlined"
-                  size="large"
-                  onClick={() => {
-                    handleClick(item.id);
-                  }}
-                >
-                  Detail
-                </Button>
+                <TableCell align="right">
+                  {" "}
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={() => {
+                      handleClick(item);
+                    }}
+                  >
+                    Detail
+                  </Button>
+                </TableCell>
               </TableRow>
             );
           })}

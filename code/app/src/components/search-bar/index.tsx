@@ -9,6 +9,7 @@ export const Search = () => {
   const [searchValue, setValue] = useState("");
   let search = () => {
     navigate("/search", { state: { keyword: searchValue } });
+    window.location.reload();
   };
 
   return (

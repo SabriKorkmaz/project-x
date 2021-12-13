@@ -40,7 +40,7 @@ class Service(db.Model):
     duration = db.Column(db.String(120),unique=False)
     credit = db.Column(db.Integer, unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
-    date = db.Column(db.DateTime, unique=False)
+    date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
 
@@ -100,7 +100,7 @@ class Meetup(db.Model):
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
-    date = db.Column(db.DateTime, unique=False)
+    date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
 
