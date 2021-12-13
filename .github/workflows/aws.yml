@@ -56,7 +56,7 @@ jobs:
       - run: docker tag project-x-frontend sbrkrkmz/project-x:project-x-frontend
       - run: docker push sbrkrkmz/project-x:project-x-frontend
   backend-push-docker:
-    needs: frontend-push-docker
+    needs: [frontend-push-docker]
     runs-on:  ubuntu-latest
     defaults:
       run:
@@ -64,24 +64,26 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: docker login -u="${{secrets.DOCKER_USERNAME}}" -p="${{secrets.DOCKER_PASSWORD}}"
-      - run: docker-compose up
-      - run: docker-compose push
+      - run: docker build -t project-x-api .
+      - run: docker tag project-x-api sbrkrkmz/project-x-api
+      - run: docker push sbrkrkmz/project-x-api
+
   connect-ec2:
-    needs: backend-push-docker
+    needs: [backend-push-docker]
     runs-on: ubuntu-latest    
     steps:
       - uses: actions/checkout@v2 
       - name: Deploy in EC2
         run: |
-          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-63-33-66-10.eu-west-1.compute.amazonaws.com '
+          echo "${{env.PRIVATE_KEY}}" > private_key && chmod 600 private_key 
+          ssh -o StrictHostKeyChecking=no -i private_key ec2-user@ec2-3-249-84-253.eu-west-1.compute.amazonaws.com '
             ls -ld
             docker login -u="${{env.DOCKER_USERNAME}}" -p="${{env.DOCKER_PASSWORD}}"
             docker rm -f $(docker ps -a -q)
             docker rmi $(docker images -a -q)
             docker pull sbrkrkmz/project-x:project-x-frontend
             docker pull sbrkrkmz/project-x-api
-            docker run -dp 5555:5555 --name project-x-api sbrkrkmz/project-api
+            docker-compose up -d
             docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
           '
   
