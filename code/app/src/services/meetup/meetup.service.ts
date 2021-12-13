@@ -33,4 +33,8 @@ export abstract class MeetupService {
       this.baseUrl + "getAll/" + userId
     );
   }
+
+  static async getLatest<T>() {
+    return await BaseService.getDataFromApi<T>({}, this.baseUrl + "latest");
+  }
 }

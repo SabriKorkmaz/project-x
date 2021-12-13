@@ -37,7 +37,6 @@ export default function CreateModal(props: CreateModalProps) {
   }, [props.data]);
   let Adapter = AdapterDateFns as any;
   const [input, setInput] = useState({
-    name: "",
     title: "",
     capacity: 1,
     address: "",
@@ -47,7 +46,7 @@ export default function CreateModal(props: CreateModalProps) {
     userId: props.userId,
     id: 0,
   });
-  const [date, setDate] = React.useState<Date | null>(new Date());
+  const [dateValue, setDate] = React.useState<any>(Date());
   const [imageUrl, setImgSource] = useState("");
   const [file, setFile] = useState(null as any);
   const onFileChange = (event: any) => {
@@ -70,6 +69,26 @@ export default function CreateModal(props: CreateModalProps) {
 
   const save = async () => {
     let result = null;
+    let isValid = true;
+    Object.keys(input).forEach((key) => {
+      if (key !== "id" && (input[key] === "" || input[key] === 0)) {
+        console.log(input[key]);
+        console.log(key);
+        isValid = false;
+      }
+    });
+
+    if (!isValid) {
+      setSnack({
+        message: "Form alanları boş geçilemez",
+        open: true,
+        type: "error",
+      });
+      return;
+    }
+    //@ts-ignore
+    let date = new Date(dateValue).toLocaleString();
+
     if (props.type === ModalType.Service) {
       let service: ServiceModel = { ...input, date, imageUrl };
       console.log(service);
@@ -248,10 +267,10 @@ export default function CreateModal(props: CreateModalProps) {
               <DateTimePicker
                 renderInput={(props) => <TextField {...props} />}
                 label="Date"
-                value={date}
-                inputFormat={"mm/dd/yy hh:mm:ss"}
+                value={dateValue}
                 onChange={(newValue) => {
-                  setDate(new Date(newValue as any));
+                  console.log(newValue);
+                  setDate(newValue as any);
                 }}
               />
             </LocalizationProvider>
