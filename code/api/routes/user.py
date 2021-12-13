@@ -2,7 +2,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
 from models.index import User
-from models.index import UserMeetup,UserService
+from models.index import UserMeetup,UserService,Meetup,Service
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
@@ -331,4 +331,34 @@ def update_service(current_user,id):
 
     return jsonify({'message': 'Service request is accepted!', "isSuccess": 1})
 
+
+@userRoute.route('/user/search', methods=['POST'])
+@token_required
+def search(current_user,id):
+        data = request.get_json()
+
+        meetups = Meetup.query.filter(Meetup.title.contains(data['keyword']))
+        services = Meetup.query.filter(Service.title.contains(data['keyword']))
+
+        data_service = []
+
+        for service in services:
+            value = {'title': service.title, 'description': service.description,
+                     "credit": service.credit, "userId": service.userId,
+                     'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                     'duration': service.duration, "id": service.id,
+                     'date': service.date}
+            data_service.append(value)
+
+        data_meetup = []
+
+        for meetup in meetups:
+            value = {'imageUrl': meetup.imageUrl, 'title': meetup.title, "description": meetup.description,
+                     'address': meetup.address,
+                     'duration': meetup.duration, 'userId': meetup.userId,
+                     'capacity': meetup.capacity, "id": meetup.id,
+                     'date': meetup.date}
+            data_meetup.append(value)
+
+        return jsonify({'dataMeetup': data_meetup,'dataService': data_service, "isSuccess": 1})
 
