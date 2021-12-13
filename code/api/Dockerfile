@@ -14,4 +14,5 @@ ENV FLASK_APP=server.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_ENV=development
 EXPOSE 5555
-
+ENTRYPOINT ["python"]
+CMD ["server.py"]
