@@ -333,12 +333,11 @@ def update_service(current_user,id):
 
 
 @userRoute.route('/user/search', methods=['POST'])
-@token_required
-def search(current_user,id):
+def search():
         data = request.get_json()
 
         meetups = Meetup.query.filter(Meetup.title.contains(data['keyword']))
-        services = Meetup.query.filter(Service.title.contains(data['keyword']))
+        services = Service.query.filter(Service.title.contains(data['keyword']))
 
         data_service = []
 

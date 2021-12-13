@@ -72,4 +72,8 @@ export abstract class UserService {
       this.baseUrl + "acceptRegisteredService/" + id
     );
   }
+
+  static async search<T>(request: any) {
+    return await BaseService.postData<T>(request, this.baseUrl + "search");
+  }
 }

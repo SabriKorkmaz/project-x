@@ -158,7 +158,7 @@ const AllRoute = observer(() => {
           }
         />
         <Route
-          path="/search/:keyword"
+          path="/search"
           element={
             <Header user={user} auth={auth}>
               <Search />

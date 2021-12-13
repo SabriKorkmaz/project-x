@@ -1,25 +1,28 @@
-//import {observer} from "mobx-react";
 import { Box } from "@material-ui/core";
-import React from "react";
-/*
-import TableList from "../../components/table";
-import { ITable } from "../../components/table/interface";
-*/
+import React, { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
+import SearchTable from "../../components/search-table";
+import { UserService } from "../../services/user/user.service";
 
-//@observer
 export const Search = (props: any) => {
-  //const { setSnack } = useContext(SnackbarContext);
-  /*
-        let data = {} as ITable;
-      */
+  const { state } = useLocation();
+  const { keyword } = state;
+  const [data, setData] = useState([] as any);
+  useEffect(() => {
+    const fetchData = async () => {
+      let result = await UserService.search({
+        keyword: keyword,
+      });
+      console.log(result);
+      setData([]);
+    };
+    fetchData();
+  }, []);
+
   return (
     <React.Fragment>
       <Box style={{ marginTop: "20px" }}>
-        {/*<TableList
-          data={data}
-          showDeleteButton={false}
-          showEditButton={false}
-        />*/}
+        <SearchTable data={data} />
       </Box>
     </React.Fragment>
   );
