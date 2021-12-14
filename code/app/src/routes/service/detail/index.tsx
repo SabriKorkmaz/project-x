@@ -29,10 +29,12 @@ const MeetupDetail = observer((props: any) => {
   const { setSnack } = useContext(SnackbarContext);
 
   let getServiceAttendees = async (id: number) => {
-    let result = await UserService.getServiceAttendees<ResponseModel<any[]>>(
-      id
-    );
-    setServiceAttendees(result.data);
+    if (props.auth) {
+      let result = await UserService.getMeetupAttendees<ResponseModel<any[]>>(
+        id
+      );
+      setServiceAttendees(result.data);
+    }
   };
 
   let disableRequestText = () => {
@@ -148,7 +150,7 @@ const MeetupDetail = observer((props: any) => {
   };
 
   const requestButton = () => {
-    if (!owner)
+    if (!owner && props.auth)
       return (
         <Fab
           disabled={requestedService().exist}
@@ -171,7 +173,12 @@ const MeetupDetail = observer((props: any) => {
   };
   const cancelButton = () => {
     if (props.user && serviceAttendees.length) {
-      if (!owner && requestedService().exist && !requestedService().status) {
+      if (
+        !owner &&
+        requestedService().exist &&
+        !requestedService().status &&
+        props.auth
+      ) {
         return (
           <Fab
             onClick={async () => {
@@ -195,7 +202,7 @@ const MeetupDetail = observer((props: any) => {
   };
 
   const attendeeList = () => {
-    if (owner) {
+    if (owner && props.auth) {
       return (
         <AttendeeList
           acceptAction={acceptAction}
