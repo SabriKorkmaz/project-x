@@ -34,7 +34,7 @@ class Service(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), unique=False)
-    description = db.Column(db.String(420), unique=False)
+    description = db.Column(db.String(840), unique=False)
     capacity = db.Column(db.Integer, unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120),unique=False)
@@ -95,7 +95,7 @@ class Meetup(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), unique=False)
-    description = db.Column(db.String(420), unique=False)
+    description = db.Column(db.String(840), unique=False)
     capacity = db.Column(db.Integer, unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120), unique=False)
