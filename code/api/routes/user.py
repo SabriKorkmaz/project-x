@@ -326,7 +326,9 @@ def update_service(current_user,id):
     userservice: object = UserService.query.filter_by(id=id).first()
 
     userservice.status = True
-
+    service = Service.query.filter_by(id=userservice.serviceId).first()
+    user = User.query.filter_by(id = service.userId).first()
+    user.credit = user.credit + service.credit
     db.session.commit()
 
     return jsonify({'message': 'Service request is accepted!', "isSuccess": 1})
