@@ -30,7 +30,7 @@ const MeetupDetail = observer((props: any) => {
 
   let getServiceAttendees = async (id: number) => {
     if (props.auth) {
-      let result = await UserService.getMeetupAttendees<ResponseModel<any[]>>(
+      let result = await UserService.getServiceAttendees<ResponseModel<any[]>>(
         id
       );
       setServiceAttendees(result.data);

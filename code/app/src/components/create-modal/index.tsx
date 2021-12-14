@@ -12,9 +12,7 @@ import DateTimePicker from "@mui/lab/DateTimePicker";
 import { InputLabel } from "@mui/material";
 import { MeetupService } from "../../services/meetup/meetup.service";
 import { ServiceService } from "../../services/service/service.service";
-import { ServiceModel } from "../../services/service/service.interface";
 import { SnackbarContext } from "../../index";
-import { MeetupModel } from "../../services/meetup/meetup.interface";
 import { BaseService } from "../../services/base/base.service";
 import { ProcessType } from "../../utils/process-type.enum";
 import MainStore from "../../stores/index";
@@ -68,10 +66,12 @@ export default function CreateModal(props: CreateModalProps) {
   };
 
   const save = async () => {
-    let result = null;
     let isValid = true;
-    Object.keys(input).forEach((key) => {
-      if (key !== "id" && (input[key] === "" || input[key] === 0)) {
+    let date = new Date(dateValue).toLocaleString();
+    let result = { ...input, date, imageUrl };
+    Object.keys(result).forEach((key) => {
+      console.log(input);
+      if (key !== "id" && (result[key] === "" || result[key] === 0)) {
         console.log(input[key]);
         console.log(key);
         isValid = false;
@@ -86,24 +86,19 @@ export default function CreateModal(props: CreateModalProps) {
       });
       return;
     }
-    //@ts-ignore
-    let date = new Date(dateValue).toLocaleString();
 
+    let response = null;
     if (props.type === ModalType.Service) {
-      let service: ServiceModel = { ...input, date, imageUrl };
-      console.log(service);
-      result = await ServiceService.save(service);
+      response = await ServiceService.save(result);
     } else if (props.type === ModalType.Meetup) {
-      let meetup: MeetupModel = { ...input, date, imageUrl };
-      console.log(meetup);
-      result = await MeetupService.save(meetup);
+      response = await MeetupService.save(result);
     }
     await MainStore.updateUser();
     if (result) {
       setSnack({
-        message: result.message,
+        message: response.message,
         open: true,
-        type: result.isSuccess ? "success" : "error",
+        type: response.isSuccess ? "success" : "error",
       });
       setInterval(() => {
         window.location.reload();
