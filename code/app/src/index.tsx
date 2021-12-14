@@ -154,8 +154,8 @@ const AllRoute = observer(() => {
           path="/"
           element={
             <Header user={user} auth={auth}>
-              <Latest type={ModalType.Service} name="Service" />
-              <Latest type={ModalType.Meetup} name="Meetup" />
+              <Latest type={ModalType.Service} name="Services" />
+              <Latest type={ModalType.Meetup} name="Meetups" />
             </Header>
           }
         />
