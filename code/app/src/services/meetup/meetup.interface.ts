@@ -1,4 +1,5 @@
 import { BaseModel } from "../base/base.interface";
+import { UserModel } from "../user/user.inteface";
 
 export interface MeetupModel extends BaseModel {
   description: string;
@@ -9,4 +10,7 @@ export interface MeetupModel extends BaseModel {
   address: string;
   date: any;
   userId: number;
+  longitude: string;
+  latitude: string;
+  owner: Partial<UserModel>;
 }

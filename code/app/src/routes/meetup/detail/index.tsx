@@ -1,6 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import { Box, Card, CardContent, Divider, Fab } from "@material-ui/core";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Divider,
+  Fab,
+} from "@material-ui/core";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import { CircularProgress } from "@mui/material";
@@ -28,6 +35,7 @@ const MeetupDetail = observer((props: any) => {
   const { id } = state;
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
+  let navigate = useNavigate();
 
   let getMeetupAttendees = async (id: number) => {
     if (props.auth) {
@@ -223,6 +231,16 @@ const MeetupDetail = observer((props: any) => {
         <HeaderImg data={data} />
         <Card style={{ minWidth: 275, display: "flex", marginBottom: 20 }}>
           <CardContent>
+            <Typography sx={{ fontSize: 14 }} gutterBottom>
+              Owner:
+              <Button
+                onClick={() => {
+                  navigate("/profile/detail", { state: { id: data.owner.id } });
+                }}
+              >
+                {`${data.owner.name} ${data.owner.surname}`}
+              </Button>
+            </Typography>
             <Typography sx={{ fontSize: 14 }} gutterBottom>
               Description
             </Typography>

@@ -2,7 +2,6 @@ from db.index import db
 
 
 class User(db.Model):
-
     __tablename__ = 'user'
 
     id = db.Column(db.Integer, primary_key=True)
@@ -29,25 +28,29 @@ class User(db.Model):
 
 
 class Service(db.Model):
-
     __tablename__ = 'service'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(840), unique=False)
     capacity = db.Column(db.Integer, unique=False)
+    longitude = db.Column(db.String(120), unique=False)
+    latitude = db.Column(db.String(120), unique=False)
     address = db.Column(db.String(120), unique=False)
-    duration = db.Column(db.String(120),unique=False)
-    credit = db.Column(db.Integer, unique=False)
+    duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
     date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
+    comments = db.relationship('UserServiceComment', backref='Service', lazy='dynamic')
 
-    def __init__(self,  title, description,duration, capacity, credit, address, imageUrl, date, userId,createdDate):
+    def __init__(self, title, description, duration, longitude, latitude, capacity, credit, address, imageUrl, date,
+                 userId, createdDate):
         self.title = title
         self.description = description
         self.capacity = capacity
+        self.longitude = longitude
+        self.latitude = latitude
         self.credit = credit
         self.address = address
         self.imageUrl = imageUrl
@@ -58,16 +61,19 @@ class Service(db.Model):
 
 
 class UserService(db.Model):
+    __tablename__ = 'userService'
+
     id = db.Column(db.Integer, primary_key=True)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     serviceId = db.Column(db.Integer, db.ForeignKey('service.id'))
     status = db.Column(db.Boolean, unique=False, default=False)
-    credit = db.Column(db.Integer, unique=False)
     user = db.relationship('User', backref='UserService', lazy=True, uselist=False)
     createdDate = db.Column(db.DateTime, unique=False)
+    serviceStatus = db.Column(db.Integer, unique=False)
 
-    def __init__(self,  userId, serviceId,  credit,status, createdDate):
+    def __init__(self, userId, serviceId, credit, status, createdDate, serviceStatus):
         self.userId = userId
+        self.serviceStatus = serviceStatus
         self.serviceId = serviceId
         self.status = status
         self.credit = credit
@@ -75,45 +81,91 @@ class UserService(db.Model):
 
 
 class UserMeetup(db.Model):
+    __tablename__ = 'userMeetup'
+
     id = db.Column(db.Integer, primary_key=True)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     meetupId = db.Column(db.Integer, db.ForeignKey('meetup.id'))
-    status = db.Column(db.Boolean, unique=False,default=False)
+    status = db.Column(db.Boolean, unique=False, default=False)
     user = db.relationship('User', backref='UserMeetup', lazy=True, uselist=False)
     createdDate = db.Column(db.DateTime, unique=False)
+    serviceStatus = db.Column(db.Integer, unique=False)
 
-    def __init__(self,  userId, meetupId,  status, createdDate):
+    def __init__(self, userId, serviceId, credit, status, createdDate, serviceStatus):
         self.userId = userId
-        self.meetupId = meetupId
+        self.serviceStatus = serviceStatus
+        self.serviceId = serviceId
         self.status = status
+        self.credit = credit
         self.createdDate = createdDate
 
 
-class Meetup(db.Model):
+class UserServiceComment(db.Model):
+    __tablename__ = 'userServiceComment'
 
+    id = db.Column(db.Integer, primary_key=True)
+    serviceId = db.Column(db.Integer, db.ForeignKey('service.id'))
+    userId = db.Column(db.Integer, db.ForeignKey("user.id"))
+    user = db.relationship('User', backref='UserServiceComment', lazy=True, uselist=False)
+    createdDate = db.Column(db.DateTime, unique=False)
+    comment = db.Column(db.String(240),unique=False)
+    serviceStatus = db.Column(db.Integer, unique=False)
+    rate = db.Column(db.Integer,unique=False)
+    def __init__(self,rate,userId,serviceId, createdDate, serviceStatus,ownerId):
+        self.serviceStatus = serviceStatus
+        self.serviceId = serviceId
+        self.createdDate = createdDate
+        self.ownerId = ownerId,
+        self.userId =userId,
+        self.rate = rate
+
+
+class UserMeetupComment(db.Model):
+    __tablename__ = 'userMeetupComment'
+
+    id = db.Column(db.Integer, primary_key=True)
+    meetupId = db.Column(db.Integer, db.ForeignKey('meetup.id'))
+    userId = db.Column(db.Integer, db.ForeignKey("user.id"))
+    createdDate = db.Column(db.DateTime, unique=False)
+    comment = db.Column(db.String(240),unique=False)
+    user = db.relationship('User', backref='UserMeetupComment', lazy=True, uselist=False)
+    meetupStatus = db.Column(db.Integer, unique=False)
+    rate = db.Column(db.Integer, unique=False)
+    def __init__(self, userId, meetupId, status, createdDate, meetupStatus,ownerId):
+        self.userId = userId
+        self.meetupStatus = meetupStatus
+        self.meetupId = meetupId
+        self.status = status
+        self.createdDate = createdDate
+        self.ownerId = ownerId
+
+
+class Meetup(db.Model):
     __tablename__ = 'meetup'
 
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(840), unique=False)
     capacity = db.Column(db.Integer, unique=False)
+    longitude = db.Column(db.String(120), unique=False)
+    latitude = db.Column(db.String(120), unique=False)
     address = db.Column(db.String(120), unique=False)
     duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
     date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
-
-    def __init__(self, title, description,duration, capacity, address, imageUrl, date, userId,createddate):
+    comments = db.relationship('UserMeetupComment', backref='Meetup', lazy='dynamic')
+    def __init__(self, title, description, duration, longitude, latitude, capacity, address, imageUrl, date, userId,
+                 createddate):
         self.title = title
         self.description = description
         self.capacity = capacity
         self.duration = duration
+        self.longitude = longitude
+        self.latitude = latitude
         self.address = address
         self.imageUrl = imageUrl
         self.date = date
         self.userId = userId
         self.createdDate = createddate
-
-
-

@@ -53,10 +53,17 @@ def get_one_user(current_user, id):
     meetups = []
 
     for meetup in user.meetups:
-        value = {'title': meetup.title, 'description': meetup.description,
+
+        comments = []
+        for comment in meetup.comments:
+            commentvalue = {"id":comment.id, "comment":comment.comment, "rate":comment.rate,
+                            "owner":{"name":comment.user.name,"surname":comment.user.surname}}
+
+        comments.append(commentvalue)
+        value = {'title': meetup.title,
                  "userId": meetup.userId,
                  'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
-                 'duration': meetup.duration, "id": meetup.id,
+                 'duration': meetup.duration, "id": meetup.id, "comments": comments,
                  'date': meetup.date}
         meetups.append(value)
     user_data['meetups'] = meetups

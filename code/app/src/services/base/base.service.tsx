@@ -5,8 +5,8 @@ import { ResponseModel } from "./response.interface";
 
 export abstract class BaseService {
   public static readonly baseUrl =
-    "http://ec2-3-249-84-253.eu-west-1.compute.amazonaws.com:5555/";
-  /*    "http://localhost:5555/";*/
+    /*  "http://ec2-3-249-84-253.eu-west-1.compute.amazonaws.com:5555/";*/
+    "http://localhost:5555/";
   private static axios?: AxiosInstance;
   private static readonly authToken: string = "x-access-token";
 

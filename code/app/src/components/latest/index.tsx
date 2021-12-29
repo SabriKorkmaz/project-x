@@ -24,7 +24,7 @@ export default function Latest(props: any) {
   }, []);
 
   let card = () => {
-    if (data.length) {
+    if (data?.length) {
       return (
         <Box sx={{ display: "flex", marginTop: "10px" }}>
           {data?.map((item: any) => {

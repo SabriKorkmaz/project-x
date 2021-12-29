@@ -1,5 +1,5 @@
 from datetime import datetime
-from models.index import Service
+from models.index import Service,User
 from func.token import token_required
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
@@ -19,7 +19,7 @@ def get_latest():
         value = {'title': service.title, 'description': service.description,
                  "credit": service.credit,"userId": service.userId,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration, "id": service.id,
+                 'duration': service.duration, "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
         data.append(value)
 
@@ -36,7 +36,7 @@ def get_all_services(current_user, id):
         value = {'title': service.title, 'description': service.description,
                  "credit": service.credit,"userId": service.userId,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration, "id": service.id,
+                 'duration': service.duration, "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
         data.append(value)
 
@@ -46,13 +46,14 @@ def get_all_services(current_user, id):
 @serviceRoute.route('/service/get/<id>', methods=['GET'])
 def get_one_service(id):
     service = Service.query.filter_by(id=id).first()
-
+    user = User.query.filter_by(id=service.userId).first()
     if not service:
         return jsonify({'message': 'No service found!', "isSuccess": 0})
 
     value = {'title': service.title, 'description': service.description, 'credit': service.credit,
              'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-             'duration': service.duration, "id":service.id,
+             "owner": {"id": user.id, "name": user.name, "surname": user.surname},
+             'duration': service.duration, "id":service.id,"longitude":service.longitude,"latitude":service.latitude,
              'date': service.date}
 
     return jsonify({'data': value, "isSuccess": 1})
@@ -70,6 +71,8 @@ def create_service(current_user):
         address=data['address'],
         duration=data['duration'],
         imageUrl=data['imageUrl'],
+        longitude=data['longitude'],
+        latitude=data['latitude'],
         credit=data['credit'],
         date=data['date'],
         userId=current_user.id,
@@ -92,6 +95,8 @@ def update_service(current_user,id):
     service.description = data['description'],
     service.capacity = data['capacity'],
     service.address = data['address'],
+    service.longitude = data['longitude'],
+    service.latitude = data['latitude'],
     service.imageUrl = data['imageUrl'],
     service.date = data['date'],
     service.credit = data['credit'],

@@ -1,6 +1,6 @@
 from datetime import datetime,timezone
 import os
-from models.index import Meetup, UserMeetup
+from models.index import Meetup, User
 from func.token import token_required
 from flask import request, jsonify, url_for
 from werkzeug.utils import secure_filename
@@ -21,6 +21,9 @@ def get_latest():
     for meetup in meetups:
         value = {'imageUrl': meetup.imageUrl, 'title': meetup.title,"description":meetup.description,
                  'address': meetup.address,
+                 "longitude": meetup.longitude,
+                 "latitude": meetup.latitude,
+
                  'duration': meetup.duration,'userId': meetup.userId,
                  'capacity': meetup.capacity,"id": meetup.id,
                  'date': meetup.date}
@@ -40,6 +43,8 @@ def get_all_meetups(current_user, id):
     for meetup in meetups:
         value = {'imageUrl': meetup.imageUrl, 'title': meetup.title,"description":meetup.description,
                  'address': meetup.address,
+                 "longitude": meetup.longitude,
+                 "latitude": meetup.latitude,
                  'duration': meetup.duration,'userId': meetup.userId,
                  'capacity': meetup.capacity,"id": meetup.id,
                  'date': meetup.date}
@@ -51,14 +56,17 @@ def get_all_meetups(current_user, id):
 @meetupRoute.route('/meetup/get/<id>', methods=['GET'])
 def get_one_meetup(id):
     meetup = Meetup.query.filter_by(id=id).first()
-
+    user = User.query.filter_by(id=meetup.userId).first()
     if not meetup:
         return jsonify({'message': 'No meetup found!', "isSuccess": 0})
 
     value = { 'title': meetup.title, 'description': meetup.description,
-             'duration': meetup.duration,"id": meetup.id,"userId":meetup.userId,
-             'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
-             'date': meetup.date}
+              "longitude": meetup.longitude,
+              "latitude": meetup.latitude,
+              "owner": {"id":user.id, "name":user.name, "surname":user.surname},
+              'duration': meetup.duration,"id": meetup.id,"userId":meetup.userId,
+              'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
+              'date': meetup.date}
 
     return jsonify({'data': value, "isSuccess": 1})
 
@@ -88,6 +96,8 @@ def create_meetup(current_user):
         capacity=data['capacity'],
         duration=data['duration'],
         address=data['address'],
+        longitude=data['longitude'],
+        latitude=data['latitude'],
         imageUrl=data['imageUrl'],
         date=data['date'],
         userId=current_user.id,

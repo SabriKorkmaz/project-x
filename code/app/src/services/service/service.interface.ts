@@ -1,4 +1,5 @@
 import { BaseModel } from "../base/base.interface";
+import { UserModel } from "../user/user.inteface";
 
 export interface ServiceModel extends BaseModel {
   description: string;
@@ -10,4 +11,7 @@ export interface ServiceModel extends BaseModel {
   date: any;
   address: string;
   userId: number;
+  longitude: string;
+  latitude: string;
+  owner: Partial<UserModel>;
 }

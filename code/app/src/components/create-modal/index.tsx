@@ -16,15 +16,16 @@ import { SnackbarContext } from "../../index";
 import { BaseService } from "../../services/base/base.service";
 import { ProcessType } from "../../utils/process-type.enum";
 import MainStore from "../../stores/index";
+import { GoogleMaps } from "../google-maps";
 
 export default function CreateModal(props: CreateModalProps) {
   let ModalNameUpdate = props.mode == ProcessType.Create ? "Create" : "Edit";
   let ModalName = `${ModalNameUpdate} ${
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
+
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
-
   useEffect(() => {
     if (props.mode === ProcessType.Update) {
       console.log(props);
@@ -41,6 +42,8 @@ export default function CreateModal(props: CreateModalProps) {
     credit: 1,
     duration: "",
     description: "",
+    longitude: "",
+    latitude: "",
     userId: props.userId,
     id: 0,
   });
@@ -70,10 +73,7 @@ export default function CreateModal(props: CreateModalProps) {
     let date = new Date(dateValue).toLocaleString();
     let result = { ...input, date, imageUrl };
     Object.keys(result).forEach((key) => {
-      console.log(input);
       if (key !== "id" && (result[key] === "" || result[key] === 0)) {
-        console.log(input[key]);
-        console.log(key);
         isValid = false;
       }
     });
@@ -89,9 +89,9 @@ export default function CreateModal(props: CreateModalProps) {
 
     let response = null;
     if (props.type === ModalType.Service) {
-      response = await ServiceService.save(result);
+      response = await ServiceService.save(result as any);
     } else if (props.type === ModalType.Meetup) {
-      response = await MeetupService.save(result);
+      response = await MeetupService.save(result as any);
     }
     await MainStore.updateUser();
     if (result) {
@@ -105,6 +105,7 @@ export default function CreateModal(props: CreateModalProps) {
       }, 500);
     }
   };
+
   const creditInput = () => {
     if (props.type === ModalType.Service) {
       return (
@@ -289,6 +290,19 @@ export default function CreateModal(props: CreateModalProps) {
               </Button>
             </InputLabel>
             <img width={"300px"} src={imageUrl} />
+            <div style={{ height: "400px", width: "400px" }}>
+              <GoogleMaps
+                handleChange={(lng: any, lat: any) => {
+                  console.log(lng);
+                  console.log(lat);
+                  setInput((prevState) => ({
+                    ...prevState,
+                    longitude: lng,
+                    latitude: lat,
+                  }));
+                }}
+              />
+            </div>
           </Box>
         </Container>
         <Button
