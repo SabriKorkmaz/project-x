@@ -8,7 +8,6 @@ import Header from "./components/header";
 import { Search } from "./routes/search";
 import { Recovery } from "./routes/recovery";
 import HeaderWithoutSearch from "./components/header-without-search";
-import { Profile } from "./routes/profile";
 import { Services } from "./routes/service";
 import { Meetups } from "./routes/meetup";
 import { useEffect, useState } from "react";
@@ -31,19 +30,9 @@ let isAuth = () => {
   return SessionStorageUtil.getItem("auth") === "true";
 };
 const ProfileLayout = (props: any) => {
-  if (!props.auth) {
-    return (
-      <Navigate
-        to={{
-          pathname: "/",
-        }}
-      />
-    );
-  }
   return (
     <HeaderWithoutSearch auth={props.auth} user={props.user}>
       <Routes>
-        <Route path="/" element={<Profile />} />
         <Route path="/detail" element={<ProfileDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/meetups" element={<Meetups />} />

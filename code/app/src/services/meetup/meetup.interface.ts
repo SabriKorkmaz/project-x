@@ -14,3 +14,8 @@ export interface MeetupModel extends BaseModel {
   latitude: string;
   owner: Partial<UserModel>;
 }
+
+export enum StatusEnum {
+  WaitingForApprove = 1,
+  Completed = 2,
+}

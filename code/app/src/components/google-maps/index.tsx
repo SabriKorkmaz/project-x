@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";
 import ExploreIcon from "@mui/icons-material/Explore";
 import Button from "@material-ui/core/Button";
 
 const containerStyle = {
-  width: "600px",
+  width: "460px",
   height: "300px",
 };
 
@@ -21,6 +21,26 @@ export const GoogleMaps = (props: any) => {
     lat: 41.0246477,
     lng: 29.1041687,
   });
+  const geocoder = new google.maps.Geocoder();
+  useEffect(() => {
+    if (props.center != null) {
+      let fetchData = async () => {
+        console.log(props.center);
+        let result = await geocoder.geocode({
+          placeId: props.center.value.place_id,
+        });
+        if (result.results.length > 0) {
+          showPosition({
+            coords: {
+              latitude: result.results[0].geometry.location.lat(),
+              longitude: result.results[0].geometry.location.lng(),
+            },
+          });
+        }
+      };
+      fetchData();
+    }
+  }, [props.center]);
 
   const getLocation = () => {
     if (navigator.geolocation) {

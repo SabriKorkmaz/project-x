@@ -28,6 +28,8 @@ def get_all_users(current_user):
         user_data = {}
         user_data['id'] = user.id
         user_data['name'] = user.name
+        user_data['surname'] = user.surname
+        user_data['email'] = user.email
         user_data['password'] = user.password
         user_data['admin'] = user.admin
         output.append(user_data)
@@ -36,8 +38,7 @@ def get_all_users(current_user):
 
 
 @userRoute.route('/user/get/<id>', methods=['GET'])
-@token_required
-def get_one_user(current_user, id):
+def get_one_user( id):
 
     user = User.query.filter_by(id=id).first()
 
@@ -47,6 +48,10 @@ def get_one_user(current_user, id):
     user_data = {}
     user_data['id'] = user.id
     user_data['name'] = user.name
+    user_data['surname'] = user.surname
+    user_data['description'] = user.description
+    user_data['email'] = user.email
+    user_data['profileImg'] = user.profileImg
     user_data['credit'] = user.credit
     user_data['admin'] = user.admin
 
@@ -56,10 +61,13 @@ def get_one_user(current_user, id):
 
         comments = []
         for comment in meetup.comments:
-            commentvalue = {"id":comment.id, "comment":comment.comment, "rate":comment.rate,
+            commentvalue = {"id":comment.id,"date":comment.createdDate,"comment":comment.comment, "rate":comment.rate,
                             "owner":{"name":comment.user.name,"surname":comment.user.surname}}
 
-        comments.append(commentvalue)
+            comments.append(commentvalue)
+
+
+
         value = {'title': meetup.title,
                  "userId": meetup.userId,
                  'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
@@ -205,11 +213,13 @@ def delete_user_meetup(current_user, id):
 @token_required
 def save_user_meetup(current_user):
     data = request.get_json()
-    print(current_user.id)
     user_meetup = UserMeetup(
         userId=data['userId'],
         meetupId=data['meetupId'],
         status=0,
+        isUserCompleted=False,
+        isOwnerCompleted=False,
+        serviceStatus=1,
         createdDate=datetime.datetime.now(),
     )
     db.session.add(user_meetup)
@@ -246,12 +256,35 @@ def get_meetup_attendees(current_user,id):
             value = {'status': usermeetup.status,
                      "userId": usermeetup.userId,
                      "id": usermeetup.id,
+                     "isUserCompleted": usermeetup.isUserCompleted,
+                     "isOwnerCompleted": usermeetup.isOwnerCompleted,
                      "name": usermeetup.user.name,
                      "surname": usermeetup.user.surname,
                      'meetupId': usermeetup.meetupId}
             data.append(value)
 
         return jsonify({'data': data, "isSuccess": 1})
+
+
+@userRoute.route('/user/update/<id>', methods=['POST'])
+@token_required
+def update_user(current_user,id):
+    data = request.get_json()
+
+    user: object = User.query.filter_by(id=id).first()
+
+    user_data = {}
+    user.name = data["name"]
+    user.surname = data["surname"]
+    user.description = data["description"]
+    user.email = data["email"]
+    user.profileImg = data["profileImg"]
+    hashed_password = generate_password_hash(data['password'], method='sha256')
+    user.password = hashed_password
+
+    db.session.commit()
+
+    return jsonify({'message': 'User updated!', "isSuccess": 1})
 
 
 @userRoute.route('/user/acceptRegisteredMeetup/<id>', methods=['POST'])

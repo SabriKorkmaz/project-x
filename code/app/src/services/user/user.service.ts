@@ -13,6 +13,13 @@ export abstract class UserService {
     return await BaseService.postData(request, this.baseUrl + "create");
   }
 
+  static async update(request: Partial<UserModel>) {
+    return await BaseService.postData(
+      request,
+      this.baseUrl + "update/" + request.id
+    );
+  }
+
   static async getUser<T>(id: number) {
     return await BaseService.getDataFromApi<T>(id, this.baseUrl + "get/" + id);
   }

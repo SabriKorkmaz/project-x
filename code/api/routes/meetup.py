@@ -1,6 +1,6 @@
 from datetime import datetime,timezone
 import os
-from models.index import Meetup, User
+from models.index import Meetup, User,UserMeetupComment
 from func.token import token_required
 from flask import request, jsonify, url_for
 from werkzeug.utils import secure_filename
@@ -132,8 +132,7 @@ def update_meetup(current_user,id):
 
 
 @meetupRoute.route('/meetup/upload', methods=['POST', "GET"])
-@token_required
-def upload_file(current_user):
+def upload_file():
     if request.method == 'POST':
         f = request.files['file']
         filename = secure_filename(f.filename)
@@ -149,3 +148,69 @@ def upload_file(current_user):
 @meetupRoute.route('/uploads/<name>')
 def download_file(name):
     return send_from_directory(os.path.join(UPLOAD_FOLDER), name)
+
+
+@meetupRoute.route('/meetup/createComment', methods=['POST'])
+@token_required
+def create_meetup_comment(current_user):
+    data = request.get_json()
+    new_meetup_comment = UserMeetupComment(
+        meetupId=data['meetupId'],
+        userId=current_user.id,
+        rate=data['rate'],
+        commentStatus=1,
+        createdDate= datetime.now(),
+        comment=data['comment'],
+    )
+    db.session.add(new_meetup_comment)
+    db.session.commit()
+
+    return jsonify({'message': 'Thanks for your review!', "isSuccess": 1})
+
+
+@meetupRoute.route('/meetup/updateComment/<id>', methods=['POST'])
+@token_required
+def update_meetup_comment(current_user,id):
+    data = request.get_json()
+    comment: object = UserMeetupComment.query.filter_by(id=id).first()
+    comment.commentStatus = data['commentStatus']
+    db.session.commit()
+
+    return jsonify({'message': 'Comment updated!', "isSuccess": 1})
+
+
+@meetupRoute.route('/meetup/deleteComment/<id>', methods=['DELETE'])
+@token_required
+def delete_meetup_comment(current_user, id):
+    comment = UserMeetupComment.query.filter_by(id=id).first()
+
+    if not comment:
+        return jsonify({'message': 'No comment found!', "isSuccess": 0})
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return jsonify({'message': 'The comment has been deleted!', "isSuccess": 1})
+
+
+@meetupRoute.route('/meetup/getAllComment/<id>', methods=['GET'])
+@token_required
+def get_all_meetups_comment(current_user, id):
+    print(id)
+    comments = UserMeetupComment.query.filter_by(userId=id)
+
+    data = []
+
+    for comment in comments:
+        value = {'meetupId': comment.meetupId,
+                 'createdDate': comment.createdDate,
+                 "comment":comment.comment,
+                 'rate': comment.rate,
+                 "id": comment.id,
+                 "owner":{"name":comment.user.name,
+                          "surname":comment.user.name,
+                          "id":comment.user.id},
+                 'date': comment.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})

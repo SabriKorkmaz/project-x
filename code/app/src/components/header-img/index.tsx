@@ -16,7 +16,7 @@ export const HeaderImg = (props: any) => {
           sx={{
             position: "relative",
             backgroundColor: "grey.800",
-            color: "#fff",
+            color: "#000000",
             mb: 4,
             backgroundSize: "cover",
             backgroundRepeat: "no-repeat",
@@ -49,10 +49,20 @@ export const HeaderImg = (props: any) => {
                   variant="h3"
                   color="inherit"
                   gutterBottom
+                  style={{
+                    backgroundColor: "rgb(166, 166, 166,0.7)",
+                  }}
                 >
                   {props.data.title}
                 </Typography>
-                <Typography variant="h5" color="inherit" paragraph>
+                <Typography
+                  style={{
+                    backgroundColor: "rgb(166, 166, 166,0.7)",
+                  }}
+                  variant="h5"
+                  color="inherit"
+                  paragraph
+                >
                   {props.data.description}
                 </Typography>
               </Box>

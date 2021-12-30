@@ -37,4 +37,18 @@ export abstract class MeetupService {
   static async getLatest<T>() {
     return await BaseService.getDataFromApi<T>({}, this.baseUrl + "latest");
   }
+
+  static async createComment(request: any) {
+    if (request.id) {
+      return await BaseService.postData(
+        request,
+        this.baseUrl + "updateComment/" + request.id
+      );
+    } else {
+      return await BaseService.postData(
+        request,
+        this.baseUrl + "createComment"
+      );
+    }
+  }
 }

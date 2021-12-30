@@ -158,55 +158,43 @@ const MeetupDetail = observer((props: any) => {
   };
 
   const requestButton = () => {
-    if (!owner && props.auth)
-      return (
-        <Fab
-          disabled={requestedService().exist}
-          onClick={async () => {
-            await handleRequest(data.id);
-          }}
-          style={{
-            width: "200px",
-            marginTop: 20,
-            fontSize: "medium",
-          }}
-          color={"primary"}
-          variant="extended"
-        >
-          <AddIcon sx={{ mr: 1 }} />
-          {disableRequestText()}
-        </Fab>
-      );
-    return;
+    return (
+      <Fab
+        disabled={requestedService().exist}
+        onClick={async () => {
+          await handleRequest(data.id);
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        color={"primary"}
+        variant="extended"
+      >
+        <AddIcon sx={{ mr: 1 }} />
+        {disableRequestText()}
+      </Fab>
+    );
   };
   const cancelButton = () => {
-    if (props.user && serviceAttendees.length) {
-      if (
-        !owner &&
-        requestedService().exist &&
-        !requestedService().status &&
-        props.auth
-      ) {
-        return (
-          <Fab
-            onClick={async () => {
-              await cancelRequest();
-            }}
-            style={{
-              width: "200px",
-              marginTop: 20,
-              fontSize: "medium",
-            }}
-            color={"secondary"}
-            variant="extended"
-          >
-            <DeleteForeverIcon sx={{ mr: 1 }} />
-            Cancel Request
-          </Fab>
-        );
-      }
-    }
-    return "";
+    return (
+      <Fab
+        onClick={async () => {
+          await cancelRequest();
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        color={"secondary"}
+        variant="extended"
+      >
+        <DeleteForeverIcon sx={{ mr: 1 }} />
+        Cancel Request
+      </Fab>
+    );
   };
 
   const attendeeList = () => {

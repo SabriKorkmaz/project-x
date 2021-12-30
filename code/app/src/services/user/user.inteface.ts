@@ -13,4 +13,6 @@ export interface UserModel extends BaseModel {
   admin: boolean;
   services: ServiceModel[];
   meetups: MeetupModel[];
+  description?: string;
+  profileImg?: string;
 }

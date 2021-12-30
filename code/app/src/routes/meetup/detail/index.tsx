@@ -1,16 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  Fab,
-} from "@material-ui/core";
+import { Box, Card, CardContent, Divider, Fab } from "@material-ui/core";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 import { ServiceModel } from "../../../services/service/service.interface";
 import { ResponseModel } from "../../../services/base/response.interface";
 import { MeetupService } from "../../../services/meetup/meetup.service";
@@ -24,6 +17,8 @@ import { SnackbarContext } from "../../../index";
 import { UserService } from "../../../services/user/user.service";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AttendeeList from "../../../components/attendee-list";
+import CheckIcon from "@mui/icons-material/Check";
+import CommentModal from "../../../components/comment-modal";
 
 const MeetupDetail = observer((props: any) => {
   const [load, setLoad] = useState(false);
@@ -152,55 +147,70 @@ const MeetupDetail = observer((props: any) => {
   };
 
   const requestButton = () => {
-    if (!owner && props.auth)
-      return (
-        <Fab
-          disabled={requestedMeetup().exist}
-          onClick={async () => {
-            await handleRequest(data.id);
-          }}
-          style={{
-            width: "200px",
-            marginTop: 20,
-            fontSize: "medium",
-          }}
-          color={"primary"}
-          variant="extended"
-        >
-          <AddIcon sx={{ mr: 1 }} />
-          {disableRequestText()}
-        </Fab>
-      );
-    return;
+    return (
+      <Fab
+        onClick={async () => {
+          await handleRequest(data.id);
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        color={"primary"}
+        variant="extended"
+      >
+        <AddIcon sx={{ mr: 1 }} />
+        {disableRequestText()}
+      </Fab>
+    );
   };
   const cancelButton = () => {
-    if (props.user && meetupAttendees.length) {
-      if (
-        !owner &&
-        requestedMeetup().exist &&
-        !requestedMeetup().status &&
-        props.auth
-      ) {
-        return (
-          <Fab
-            onClick={async () => {
-              await cancelRequest();
-            }}
-            style={{
-              width: "200px",
-              marginTop: 20,
-              fontSize: "medium",
-            }}
-            color={"secondary"}
-            variant="extended"
-          >
-            <DeleteForeverIcon sx={{ mr: 1 }} />
-            Cancel Request
-          </Fab>
-        );
-      }
-    }
-    return "";
+    return (
+      <Fab
+        onClick={async () => {
+          await cancelRequest();
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        color={"secondary"}
+        variant="extended"
+      >
+        <DeleteForeverIcon sx={{ mr: 1 }} />
+        Cancel Request
+      </Fab>
+    );
+  };
+  const handshakeButton = () => {
+    return (
+      <Fab
+        onClick={async () => {
+          await cancelRequest();
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        variant="extended"
+      >
+        <CheckIcon sx={{ mr: 1 }} />
+        Mark as completed
+      </Fab>
+    );
+  };
+  const commentButton = (data: any) => {
+    console.log(data);
+    return (
+      <CommentModal
+        type={ModalType.Meetup}
+        data={data}
+        buttonName="Submit a review"
+      />
+    );
   };
 
   const attendeeList = () => {
@@ -233,13 +243,13 @@ const MeetupDetail = observer((props: any) => {
           <CardContent>
             <Typography sx={{ fontSize: 14 }} gutterBottom>
               Owner:
-              <Button
+              <Link
                 onClick={() => {
                   navigate("/profile/detail", { state: { id: data.owner.id } });
                 }}
               >
                 {`${data.owner.name} ${data.owner.surname}`}
-              </Button>
+              </Link>
             </Typography>
             <Typography sx={{ fontSize: 14 }} gutterBottom>
               Description
@@ -252,6 +262,8 @@ const MeetupDetail = observer((props: any) => {
         <DogTag data={data} type={ModalType.Meetup} />
         {requestButton()}
         {cancelButton()}
+        {handshakeButton()}
+        {commentButton(data)}
       </Box>
       {attendeeList()}
     </React.Fragment>

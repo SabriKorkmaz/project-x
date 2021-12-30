@@ -18,32 +18,33 @@ import { ProcessType } from "../../utils/process-type.enum";
 import MainStore from "../../stores/index";
 import { GoogleMaps } from "../google-maps";
 
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+
 export default function CreateModal(props: CreateModalProps) {
   let ModalNameUpdate = props.mode == ProcessType.Create ? "Create" : "Edit";
   let ModalName = `${ModalNameUpdate} ${
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
-
+  const [value, setValue] = useState(null);
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   useEffect(() => {
     if (props.mode === ProcessType.Update) {
-      console.log(props);
       setInput(props.data);
       setDate(props.data.date);
       setImgSource(props.data.imageUrl);
+      setValue(props.data.address);
     }
   }, [props.data]);
   let Adapter = AdapterDateFns as any;
   const [input, setInput] = useState({
     title: "",
     capacity: 1,
-    address: "",
     credit: 1,
     duration: "",
     description: "",
-    longitude: "",
-    latitude: "",
+    longitude: 29.1041687,
+    latitude: 41.0246477,
     userId: props.userId,
     id: 0,
   });
@@ -69,9 +70,10 @@ export default function CreateModal(props: CreateModalProps) {
   };
 
   const save = async () => {
+    let address = JSON.stringify(value);
     let isValid = true;
     let date = new Date(dateValue).toLocaleString();
-    let result = { ...input, date, imageUrl };
+    let result = { ...input, date, imageUrl, address };
     Object.keys(result).forEach((key) => {
       if (key !== "id" && (result[key] === "" || result[key] === 0)) {
         isValid = false;
@@ -143,7 +145,7 @@ export default function CreateModal(props: CreateModalProps) {
         <Container style={{ display: "flex", flexDirection: "row" }}>
           <Box
             component="form"
-            style={{ flexGrow: 20 }}
+            style={{ flexGrow: 20, marginRight: 40 }}
             noValidate
             sx={{ mt: 1 }}
           >
@@ -166,28 +168,37 @@ export default function CreateModal(props: CreateModalProps) {
               id="title"
               autoComplete="title"
             />
-
-            <TextField
+            <GooglePlacesAutocomplete
+              selectProps={{
+                value,
+                onChange: setValue,
+              }}
+            />
+            {/*  <TextField
               margin="normal"
               required
               value={input.address}
-              onChange={(e) => {
-                e.persist();
 
-                setInput((prevState) => ({
-                  ...prevState,
-                  address: e.target.value,
-                }));
-              }}
               fullWidth
               variant="outlined"
               name="address"
-              minRows={4}
               multiline={true}
               label="Address"
               id="address"
               autoComplete="address "
-            />
+            />*/}
+            <div style={{ height: "400px", width: "300px" }}>
+              <GoogleMaps
+                center={value}
+                handleChange={(lng: any, lat: any) => {
+                  setInput((prevState) => ({
+                    ...prevState,
+                    longitude: lng,
+                    latitude: lat,
+                  }));
+                }}
+              />
+            </div>
             <TextField
               margin="normal"
               required
@@ -261,11 +272,12 @@ export default function CreateModal(props: CreateModalProps) {
             {creditInput()}
             <LocalizationProvider dateAdapter={Adapter}>
               <DateTimePicker
+                minutesStep={10}
                 renderInput={(props) => <TextField {...props} />}
                 label="Date"
+                disablePast
                 value={dateValue}
                 onChange={(newValue) => {
-                  console.log(newValue);
                   setDate(newValue as any);
                 }}
               />
@@ -290,19 +302,6 @@ export default function CreateModal(props: CreateModalProps) {
               </Button>
             </InputLabel>
             <img width={"300px"} src={imageUrl} />
-            <div style={{ height: "400px", width: "400px" }}>
-              <GoogleMaps
-                handleChange={(lng: any, lat: any) => {
-                  console.log(lng);
-                  console.log(lat);
-                  setInput((prevState) => ({
-                    ...prevState,
-                    longitude: lng,
-                    latitude: lat,
-                  }));
-                }}
-              />
-            </div>
           </Box>
         </Container>
         <Button
