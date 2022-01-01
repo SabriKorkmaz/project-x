@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: project-x
-        image: sbrkrkrmz/project-x/project-x-api:latest
+        image: sbrkrkmz/project-x-api:latest
         ports:
         - containerPort: 5000
         resources:
