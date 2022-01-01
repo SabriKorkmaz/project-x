@@ -30,6 +30,8 @@ export default function CreateModal(props: CreateModalProps) {
   const { setSnack } = useContext(SnackbarContext);
   useEffect(() => {
     if (props.mode === ProcessType.Update) {
+      console.log(props.data);
+      props.data.address = JSON.parse(props.data.address);
       setInput(props.data);
       setDate(props.data.date);
       setImgSource(props.data.imageUrl);

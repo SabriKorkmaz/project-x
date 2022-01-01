@@ -1,5 +1,5 @@
 from datetime import datetime
-from models.index import Service,User
+from models.index import Service,User,UserServiceComment
 from func.token import token_required
 from flask import request, jsonify
 from werkzeug.utils import secure_filename
@@ -19,7 +19,7 @@ def get_latest():
         value = {'title': service.title, 'description': service.description,
                  "credit": service.credit,"userId": service.userId,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration, "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
+                  "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
         data.append(value)
 
@@ -36,7 +36,7 @@ def get_all_services(current_user, id):
         value = {'title': service.title, 'description': service.description,
                  "credit": service.credit,"userId": service.userId,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration, "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
+                 "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
         data.append(value)
 
@@ -53,7 +53,7 @@ def get_one_service(id):
     value = {'title': service.title, 'description': service.description, 'credit': service.credit,
              'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
              "owner": {"id": user.id, "name": user.name, "surname": user.surname},
-             'duration': service.duration, "id":service.id,"longitude":service.longitude,"latitude":service.latitude,
+              "id":service.id,"longitude":service.longitude,"latitude":service.latitude,
              'date': service.date}
 
     return jsonify({'data': value, "isSuccess": 1})
@@ -69,7 +69,6 @@ def create_service(current_user):
         description=data['description'],
         capacity=data['capacity'],
         address=data['address'],
-        duration=data['duration'],
         imageUrl=data['imageUrl'],
         longitude=data['longitude'],
         latitude=data['latitude'],
@@ -100,7 +99,6 @@ def update_service(current_user,id):
     service.imageUrl = data['imageUrl'],
     service.date = data['date'],
     service.credit = data['credit'],
-    service.duration = data['duration'],
     service.userId = data['userId'],
 
     db.session.commit()
@@ -131,3 +129,67 @@ def upload_file():
         return jsonify({'message': 'File successfully uploaded!', "isSuccess": 1})
 
 
+@serviceRoute.route('/service/createComment', methods=['POST'])
+@token_required
+def create_meetup_comment(current_user):
+    data = request.get_json()
+    new_meetup_comment = UserServiceComment(
+        serviceId=data['serviceId'],
+        userId=current_user.id,
+        rate=data['rate'],
+        commentStatus=1,
+        createdDate= datetime.now(),
+        comment=data['comment'],
+    )
+    db.session.add(new_meetup_comment)
+    db.session.commit()
+
+    return jsonify({'message': 'Thanks for your review!', "isSuccess": 1})
+
+
+@serviceRoute.route('/service/updateComment/<id>', methods=['POST'])
+@token_required
+def update_meetup_comment(current_user,id):
+    data = request.get_json()
+    comment: object = UserServiceComment.query.filter_by(id=id).first()
+    comment.commentStatus = data['commentStatus']
+    db.session.commit()
+
+    return jsonify({'message': 'Comment updated!', "isSuccess": 1})
+
+
+@serviceRoute.route('/service/deleteComment/<id>', methods=['DELETE'])
+@token_required
+def delete_meetup_comment(current_user, id):
+    comment = UserServiceComment.query.filter_by(id=id).first()
+
+    if not comment:
+        return jsonify({'message': 'No comment found!', "isSuccess": 0})
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return jsonify({'message': 'The comment has been deleted!', "isSuccess": 1})
+
+
+@serviceRoute.route('/service/getAllComment/<id>', methods=['GET'])
+@token_required
+def get_all_meetups_comment(current_user, id):
+    print(id)
+    comments = UserServiceComment.query.filter_by(userId=id)
+
+    data = []
+
+    for comment in comments:
+        value = {'serviceId': comment.meetupId,
+                 'createdDate': comment.createdDate,
+                 "comment":comment.comment,
+                 'rate': comment.rate,
+                 "id": comment.id,
+                 "owner":{"name":comment.user.name,
+                          "surname":comment.user.name,
+                          "id":comment.user.id},
+                 'date': comment.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})

@@ -10,7 +10,7 @@ export const ProfileHeader = (props: any) => {
           <div className="profile-img">
             <img
               src={props.data?.profileImg}
-              style={{ height: "200px" }}
+              style={{ height: "200px", maxWidth: "300px" }}
               alt=""
             />
           </div>

@@ -82,9 +82,16 @@ def get_one_user( id):
         value = {'title': service.title, 'description': service.description,
                  "credit": service.credit, "userId": service.userId,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                 'duration': service.duration, "id": service.id,
+              "id": service.id,"comments": comments,
                  'date': service.date}
         services.append(value)
+
+        comments = []
+        for comment in service.comments:
+            commentvalue = {"id":comment.id,"date":comment.createdDate,"comment":comment.comment, "rate":comment.rate,
+                            "owner":{"name":comment.user.name,"surname":comment.user.surname}}
+
+            comments.append(commentvalue)
 
     user_data['services'] = services
 
@@ -184,7 +191,7 @@ def login():
             value = {'title': service.title, 'description': service.description,
                      "credit": service.credit, "userId": service.userId,
                      'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                     'duration': service.duration, "id": service.id,
+                     "id": service.id,
                      'date': service.date}
             services.append(value)
 
@@ -387,7 +394,7 @@ def search():
             value = {'title': service.title, 'description': service.description,
                      "credit": service.credit, "userId": service.userId,
                      'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-                     'duration': service.duration, "id": service.id,
+                     "id": service.id,
                      'date': service.date}
             data_service.append(value)
 

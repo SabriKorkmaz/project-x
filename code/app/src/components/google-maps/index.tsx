@@ -11,7 +11,7 @@ const containerStyle = {
 export const GoogleMaps = (props: any) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "key-here",
+    googleMapsApiKey: "AIzaSyAHbQnFvrNtGzXp_VM85qII6VWvpBj_uUg",
   });
   const [position, setPosition] = useState({
     lat: 41.0246477,
@@ -25,7 +25,6 @@ export const GoogleMaps = (props: any) => {
   useEffect(() => {
     if (props.center != null) {
       let fetchData = async () => {
-        console.log(props.center);
         let result = await geocoder.geocode({
           placeId: props.center.value.place_id,
         });

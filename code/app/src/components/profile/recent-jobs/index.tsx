@@ -97,6 +97,87 @@ export const RecentJobs = (props: any) => {
           );
         })}
       </div>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <Typography
+          component="h2"
+          variant="h6"
+          color="primary"
+          style={{ margin: 10 }}
+          gutterBottom
+        >
+          Service Comments
+        </Typography>
+        {props.data?.services?.map((service: any, dataIndex: number) => {
+          return (
+            <Accordion style={{ marginBottom: "5px" }}>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1bh-content"
+                id="panel1bh-header"
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    width: "100%",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <Typography sx={{ width: "33%", flexShrink: 0 }}>
+                    {service.title}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    endIcon={<SendIcon />}
+                    onClick={() => {
+                      navigate("/service/detail", {
+                        state: { id: service.id },
+                      });
+                    }}
+                  >
+                    Detail
+                  </Button>
+                </div>
+              </AccordionSummary>
+              {service?.comments.map((comment: any, dataIndex: number) => {
+                return (
+                  <AccordionDetails>
+                    <Typography
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Rating
+                        name="read-only"
+                        style={{ marginBottom: 5 }}
+                        value={comment.rate}
+                        readOnly
+                      />
+                      <Typography sx={{ color: "text.secondary" }}>
+                        {comment.date}
+                      </Typography>
+                    </Typography>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <Typography>{comment.comment}</Typography>
+                      <Typography sx={{ color: "text.secondary" }}>
+                        {`${comment.owner.name} ${comment.owner.surname}`}
+                      </Typography>
+                    </div>
+                  </AccordionDetails>
+                );
+              })}
+            </Accordion>
+          );
+        })}
+      </div>
     </React.Fragment>
   );
 };

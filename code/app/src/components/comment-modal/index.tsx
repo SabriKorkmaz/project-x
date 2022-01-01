@@ -11,6 +11,7 @@ import { useContext } from "react";
 import { SnackbarContext } from "../../index";
 import Box from "@mui/material/Box";
 import { ModalType } from "../create-modal/modal-type.enum";
+import { ServiceService } from "../../services/service/service.service";
 
 const style = {
   position: "absolute" as "absolute",
@@ -47,8 +48,8 @@ export default function CommentModal(props: IModal) {
       });
     }
     if (props.type === ModalType.Service) {
-      result = await MeetupService.createComment({
-        meetupId: props.data.id,
+      result = await ServiceService.createComment({
+        serviceId: props.data.id,
         rate: comment.rate,
         comment: comment.comment,
       });

@@ -46,7 +46,7 @@ class Service(db.Model):
     createdDate = db.Column(db.DateTime, unique=False)
     comments = db.relationship('UserServiceComment', backref='Service', lazy='dynamic')
 
-    def __init__(self, title, description, duration, longitude, latitude, capacity, credit, address, imageUrl, date,
+    def __init__(self, title, description, longitude, latitude, capacity, credit, address, imageUrl, date,
                  userId, createdDate):
         self.title = title
         self.description = description
@@ -58,7 +58,6 @@ class Service(db.Model):
         self.imageUrl = imageUrl
         self.date = date
         self.userId = userId
-        self.duration = duration
         self.createdDate = createdDate
 
 
@@ -118,14 +117,14 @@ class UserServiceComment(db.Model):
     user = db.relationship('User', backref='UserServiceComment', lazy=True, uselist=False)
     createdDate = db.Column(db.DateTime, unique=False)
     comment = db.Column(db.String(240),unique=False)
-    serviceStatus = db.Column(db.Integer, unique=False)
+    commentStatus = db.Column(db.Integer, unique=False)
     rate = db.Column(db.Integer,unique=False)
-    def __init__(self,rate,userId,serviceId, createdDate, serviceStatus,ownerId):
-        self.serviceStatus = serviceStatus
+    def __init__(self,rate,userId,serviceId, createdDate, commentStatus,comment):
+        self.commentStatus = commentStatus
         self.serviceId = serviceId
         self.createdDate = createdDate
-        self.ownerId = ownerId,
-        self.userId =userId,
+        self.userId = userId
+        self.comment = comment
         self.rate = rate
 
 

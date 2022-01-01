@@ -1,16 +1,9 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Divider,
-  Fab,
-} from "@material-ui/core";
+import { Box, Card, CardContent, Divider, Fab } from "@material-ui/core";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Link } from "@mui/material";
 import { ServiceModel } from "../../../services/service/service.interface";
 import { ResponseModel } from "../../../services/base/response.interface";
 import { ModalType } from "../../../components/create-modal/modal-type.enum";
@@ -22,9 +15,11 @@ import { SnackbarContext } from "../../../index";
 import { UserService } from "../../../services/user/user.service";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AttendeeList from "../../../components/attendee-list";
+import CheckIcon from "@mui/icons-material/Check";
+import CommentModal from "../../../components/comment-modal";
 import { ServiceService } from "../../../services/service/service.service";
 
-const MeetupDetail = observer((props: any) => {
+const ServiceDetail = observer((props: any) => {
   const [load, setLoad] = useState(false);
   const [data, setData] = useState({} as ServiceModel);
   const [owner, setOwner] = useState(false);
@@ -117,7 +112,6 @@ const MeetupDetail = observer((props: any) => {
       {
         userId: props.user.id,
         serviceId: id,
-        credit: data.credit,
       }
     );
     if (result) {
@@ -160,7 +154,6 @@ const MeetupDetail = observer((props: any) => {
   const requestButton = () => {
     return (
       <Fab
-        disabled={requestedService().exist}
         onClick={async () => {
           await handleRequest(data.id);
         }}
@@ -196,9 +189,37 @@ const MeetupDetail = observer((props: any) => {
       </Fab>
     );
   };
+  const handshakeButton = () => {
+    return (
+      <Fab
+        onClick={async () => {
+          await cancelRequest();
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        variant="extended"
+      >
+        <CheckIcon sx={{ mr: 1 }} />
+        Mark as completed
+      </Fab>
+    );
+  };
+  const commentButton = (data: any) => {
+    console.log(data);
+    return (
+      <CommentModal
+        type={ModalType.Service}
+        data={data}
+        buttonName="Submit a review"
+      />
+    );
+  };
 
   const attendeeList = () => {
-    if (owner && props.auth) {
+    if (owner) {
       return (
         <AttendeeList
           acceptAction={acceptAction}
@@ -227,13 +248,13 @@ const MeetupDetail = observer((props: any) => {
           <CardContent>
             <Typography sx={{ fontSize: 14 }} gutterBottom>
               Owner:
-              <Button
+              <Link
                 onClick={() => {
                   navigate("/profile/detail", { state: { id: data.owner.id } });
                 }}
               >
                 {`${data.owner.name} ${data.owner.surname}`}
-              </Button>
+              </Link>
             </Typography>
             <Typography sx={{ fontSize: 14 }} gutterBottom>
               Description
@@ -246,10 +267,12 @@ const MeetupDetail = observer((props: any) => {
         <DogTag data={data} type={ModalType.Service} />
         {requestButton()}
         {cancelButton()}
+        {handshakeButton()}
+        {commentButton(data)}
       </Box>
       {attendeeList()}
     </React.Fragment>
   );
 });
 
-export default MeetupDetail;
+export default ServiceDetail;
