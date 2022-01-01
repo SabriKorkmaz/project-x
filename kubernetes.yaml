@@ -17,7 +17,6 @@ spec:
       containers:
       - name: project-x
         image: sbrkrkmz/project-x-api:latest
-        restartPolicy: Always
         ports:
         - containerPort: 5000
         resources:
