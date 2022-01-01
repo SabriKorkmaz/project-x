@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: project-x-deployment
+  labels:
+    app: project-x
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: project-x
+  template:
+    metadata:
+      labels:
+        app: project-x
+    spec:
+      containers:
+      - name: project-x
+        image: sbrkrkmz/project-x-api:latest
+        ports:
+        - containerPort: 5555
+        resources:
+          limits:
+            cpu: 200m
+          requests:
+            cpu: 200m
