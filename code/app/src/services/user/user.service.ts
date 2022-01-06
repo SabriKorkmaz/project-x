@@ -83,4 +83,11 @@ export abstract class UserService {
   static async search<T>(request: any) {
     return await BaseService.postData<T>(request, this.baseUrl + "search");
   }
+
+  static async advancedSearch<T>(request: any) {
+    return await BaseService.postData<T>(
+      request,
+      this.baseUrl + "advancedSearch"
+    );
+  }
 }

@@ -25,7 +25,7 @@ export default function CreateModal(props: CreateModalProps) {
   let ModalName = `${ModalNameUpdate} ${
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState(null as any);
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function CreateModal(props: CreateModalProps) {
   const [dateValue, setDate] = React.useState<any>(Date());
   const [imageUrl, setImgSource] = useState("");
   const [file, setFile] = useState(null as any);
+  const geocoder = new google.maps.Geocoder();
   const onFileChange = (event: any) => {
     setFile(event.target.files[0]);
   };
@@ -71,6 +72,35 @@ export default function CreateModal(props: CreateModalProps) {
     });
   };
 
+  const setCoordinate = async (value: any) => {
+    setValue(value);
+    let result = await geocoder.geocode({
+      placeId: value.value.place_id,
+    });
+    setInput((prevState) => ({
+      ...prevState,
+      latitude: result.results[0].geometry.location.lat(),
+      longitude: result.results[0].geometry.location.lng(),
+    }));
+    /*   setInput((prevState) => ({
+                         ...prevState,
+                         longitude: lng.toFixed(4),
+                         latitude: lat.toFixed(4),
+                       }));*/
+  };
+  const setAutoComplete = async (lng: any, lat: any) => {
+    let value = await geocoder.geocode({
+      location: {
+        lat: lat,
+        lng: lng,
+      },
+    });
+    console.log(value);
+    setValue({
+      value: value.results[0],
+      label: value.results[0].formatted_address,
+    });
+  };
   const save = async () => {
     let address = JSON.stringify(value);
     let isValid = true;
@@ -105,7 +135,7 @@ export default function CreateModal(props: CreateModalProps) {
         type: response.isSuccess ? "success" : "error",
       });
       setInterval(() => {
-        window.location.reload();
+        //  window.location.reload();
       }, 500);
     }
   };
@@ -173,7 +203,7 @@ export default function CreateModal(props: CreateModalProps) {
             <GooglePlacesAutocomplete
               selectProps={{
                 value,
-                onChange: setValue,
+                onChange: setCoordinate,
               }}
             />
             {/*  <TextField
@@ -195,9 +225,10 @@ export default function CreateModal(props: CreateModalProps) {
                 handleChange={(lng: any, lat: any) => {
                   setInput((prevState) => ({
                     ...prevState,
-                    longitude: lng,
-                    latitude: lat,
+                    longitude: lng.toFixed(4),
+                    latitude: lat.toFixed(4),
                   }));
+                  setAutoComplete(lng, lat);
                 }}
               />
             </div>
@@ -207,7 +238,6 @@ export default function CreateModal(props: CreateModalProps) {
               value={input.description}
               onChange={(e) => {
                 e.persist();
-
                 setInput((prevState) => ({
                   ...prevState,
                   description: e.target.value,

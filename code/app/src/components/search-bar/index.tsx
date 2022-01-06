@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { Box, Slider } from "@material-ui/core";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
+import GooglePlacesAutocomplete from "react-google-places-autocomplete";
 
 const marks = [
   {
@@ -18,46 +17,43 @@ const marks = [
 ];
 export const Search = () => {
   let navigate = useNavigate();
-  const [locationDisabled, setLocationStatus] = useState(true);
-  const [distance, setDistance] = useState(0);
-  const [searchValue, setValue] = useState("");
+  const [distance, setDistance] = useState(50);
+  const [searchValue, setSearchValue] = useState("");
+
   let search = () => {
     navigate("/search", {
-      state: { keyword: searchValue, distance: distance },
+      state: { keyword: searchValue, distance: distance, location: value },
     });
     window.location.reload();
   };
+  const [value, setValue] = useState(null);
   const valueText = (value: number) => {
     return `${value} km`;
   };
 
-  const getLocation = () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(showPosition, showError);
-    } else {
-    }
-  };
-
-  const showPosition = (position: any) => {
-    console.log(position);
-  };
-
-  const handleGeolocation = () => {
-    if (locationDisabled) {
-      console.log("active");
-      getLocation();
-      return;
-    }
-    return;
-  };
-
-  function showError(error: any) {
-    switch (error.code) {
-      case error.PERMISSION_DENIED:
-        alert("Permission Denied");
-        break;
-    }
-  }
+  /*  const getLocation = () => {
+                  if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition, showError);
+                  } else {
+                  }
+                };
+  
+                const showPosition = (position: any) => {
+                  console.log(position);
+                };
+  
+                const handleGeolocation = () => {
+                  getLocation();
+                  return;
+                };
+  
+                function showError(error: any) {
+                  switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                      alert("Permission Denied");
+                      break;
+                  }
+                }*/
 
   return (
     <React.Fragment>
@@ -74,7 +70,7 @@ export const Search = () => {
         </Typography>
         <SearchBar
           value={searchValue}
-          onChange={(value: string) => setValue(value)}
+          onChange={(value: string) => setSearchValue(value)}
           onRequestSearch={() => {
             search();
           }}
@@ -82,25 +78,17 @@ export const Search = () => {
             width: "100%",
           }}
         />
-        <Box sx={{ width: 400, display: "flex" }}>
-          <FormControlLabel
-            sx={{ marginRight: "10px", minWidth: 100, color: "initial" }}
-            value="start"
-            control={
-              <Checkbox
-                value={!locationDisabled}
-                checked={!locationDisabled}
-                onClick={() => {
-                  handleGeolocation();
-                }}
-                onChange={(e) => {
-                  setLocationStatus(!locationDisabled);
-                }}
-              />
-            }
-            label="Use location"
-            labelPlacement="start"
-          />
+        <Box sx={{ width: 900, display: "flex", marginTop: 10 }}>
+          <div style={{ marginRight: "30px", minWidth: 300, color: "initial" }}>
+            <GooglePlacesAutocomplete
+              selectProps={{
+                value,
+                onChange: setValue,
+                placeholder: "Select Location",
+              }}
+            />
+          </div>
+
           <Slider
             aria-label="Custom marks"
             defaultValue={distance}
@@ -113,7 +101,6 @@ export const Search = () => {
               console.log(newValue);
             }}
             min={0}
-            disabled={locationDisabled}
             max={100}
           />
         </Box>
