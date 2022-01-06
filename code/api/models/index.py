@@ -38,7 +38,7 @@ class Service(db.Model):
     capacity = db.Column(db.Integer, unique=False)
     longitude = db.Column(db.String(120), unique=False)
     latitude = db.Column(db.String(120), unique=False)
-    address = db.Column(db.String(1120), unique=False)
+    address = db.Column(db.String(2120), unique=False)
     credit = db.Column(db.Integer, unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
     date = db.Column(db.String(120), unique=False)
@@ -157,7 +157,7 @@ class Meetup(db.Model):
     capacity = db.Column(db.Integer, unique=False)
     longitude = db.Column(db.String(120), unique=False)
     latitude = db.Column(db.String(120), unique=False)
-    address = db.Column(db.String(1120), unique=False)
+    address = db.Column(db.String(2220), unique=False)
     duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
 

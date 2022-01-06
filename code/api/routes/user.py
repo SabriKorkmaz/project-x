@@ -1,3 +1,4 @@
+import math
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
 import datetime
@@ -6,7 +7,7 @@ from models.index import UserMeetup,UserService,Meetup,Service
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
-
+from sqlalchemy.sql import text
 from flask import Blueprint
 
 from models.index import db
@@ -403,6 +404,74 @@ def search():
         for meetup in meetups:
             value = {'imageUrl': meetup.imageUrl, 'title': meetup.title, "description": meetup.description,
                      'address': meetup.address,
+                     'duration': meetup.duration, 'userId': meetup.userId,
+                     'capacity': meetup.capacity, "id": meetup.id,
+                     'date': meetup.date}
+            data_meetup.append(value)
+
+        return jsonify({'dataMeetup': data_meetup,'dataService': data_service, "isSuccess": 1})
+
+
+@userRoute.route('/user/advancedSearch', methods=['POST'])
+def advancedSearch():
+        data = request.get_json()
+
+        services = db.session.execute(
+                                        "SELECT"
+                                        "*, ("
+                                        "6371 * acos ("
+                                        " cos ( radians(:lat) )"
+                                        "* cos( radians( ProjectX.service.latitude ) )"
+                                        "* cos( radians( ProjectX.service.longitude ) - radians(:lng) )"
+                                        "+ sin ( radians(:lat) ) "
+                                        "* sin( radians( ProjectX.service.latitude ) ) "
+                                        " )"
+                                        ") AS distance "
+                                        "FROM ProjectX.service "
+                                        "where ProjectX.service.title like '%' :keyword '%' "
+                                        "Having distance < :distance "
+                                        "ORDER BY distance "
+                                        "LIMIT 0 , 20 ", { "keyword": data["keyword"],"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
+        ).fetchall()
+
+        for row in services:
+            print(row[0])
+        print(services)
+        meetups = db.session.execute(
+            "SELECT"
+            "*, ("
+            "6371 * acos ("
+            " cos ( radians(:lat) )"
+            "* cos( radians( ProjectX.meetup.latitude ) )"
+            "* cos( radians( ProjectX.meetup.longitude ) - radians(:lng) )"
+            "+ sin ( radians(:lat) )"
+            "* sin( radians( ProjectX.meetup.latitude ) )"
+            " )"
+            ") AS distance "
+            "FROM ProjectX.meetup "
+            "where ProjectX.meetup.title like '%':keyword'%' "
+            "Having distance < :distance "
+            "ORDER BY distance "
+            "LIMIT 0 , 20 ", { "keyword": data["keyword"],"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
+
+        ).fetchall()
+        print(meetups)
+
+        data_service = []
+
+        for service in services:
+            value = {'title': service.title, 'description': service.description,
+                     "credit": service.credit, "userId": service.userId,
+                     'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                     "id": service.id,"distance":math.floor(service.distance),
+                     'date': service.date}
+            data_service.append(value)
+
+        data_meetup = []
+
+        for meetup in meetups:
+            value = {'imageUrl': meetup.imageUrl, 'title': meetup.title, "description": meetup.description,
+                     'address': meetup.address,"distance":math.floor(meetup.distance),
                      'duration': meetup.duration, 'userId': meetup.userId,
                      'capacity': meetup.capacity, "id": meetup.id,
                      'date': meetup.date}
