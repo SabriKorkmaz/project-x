@@ -37,6 +37,10 @@ export abstract class ServiceService {
     );
   }
 
+  static async getServices(meetupsIds: number[]) {
+    return await BaseService.postData(meetupsIds, this.baseUrl + "getServices");
+  }
+
   static async getLatest<T>() {
     return await BaseService.getDataFromApi<T>({}, this.baseUrl + "latest");
   }

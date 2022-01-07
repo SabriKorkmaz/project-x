@@ -23,7 +23,15 @@ export default function TableList(props: ITableList) {
   let navigate = useNavigate();
   //@ts-ignore
   const { setSnack } = useContext(SnackbarContext);
-  let bannedTitles = ["userId", "address", "description", "id"];
+  let bannedTitles = [
+    "userId",
+    "address",
+    "description",
+    "id",
+    "status",
+    "longitude",
+    "latitude",
+  ];
   useEffect(() => {
     if (props.data) {
       setData(props.data.data);

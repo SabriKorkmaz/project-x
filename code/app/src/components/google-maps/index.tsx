@@ -11,7 +11,7 @@ const containerStyle = {
 export const GoogleMaps = (props: any) => {
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "",
+    googleMapsApiKey: "AIzaSyCSWXDszEwimp_P6KaR2aNT4ryxhvH4MGU",
   });
   const [position, setPosition] = useState({
     lat: 41.0246477,

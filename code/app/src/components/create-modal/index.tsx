@@ -96,7 +96,7 @@ export default function CreateModal(props: CreateModalProps) {
   const save = async () => {
     let address = JSON.stringify(value);
     let isValid = true;
-    let date = new Date(dateValue).toLocaleString();
+    let date = new Date(new Date(dateValue).setSeconds(0)).toLocaleString();
     let result = { ...input, date, imageUrl, address };
     Object.keys(result).forEach((key) => {
       if (key !== "id" && (result[key] === "" || result[key] === 0)) {
