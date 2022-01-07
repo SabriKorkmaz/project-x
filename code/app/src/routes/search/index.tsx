@@ -7,9 +7,9 @@ import { ModalType } from "../../components/create-modal/modal-type.enum";
 
 export const Search = (props: any) => {
   const { state } = useLocation();
-  const { keyword } = state;
-  const { distance } = state;
-  const { location } = state;
+  const { keyword } = state as any;
+  const { distance } = state as any;
+  const { location } = state as any;
   const geocoder = new google.maps.Geocoder();
 
   const [data, setData] = useState({} as any);
