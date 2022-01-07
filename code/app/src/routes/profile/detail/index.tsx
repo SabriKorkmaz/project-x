@@ -10,7 +10,7 @@ import UpdateProfile from "..";
 
 const ProfileDetail = observer((props: any) => {
   const { state } = useLocation();
-  const { id } = state;
+  const { id } = state as any;
   const [result, setResult] = useState({} as any);
   useEffect(() => {
     let fetchData = async () => {
