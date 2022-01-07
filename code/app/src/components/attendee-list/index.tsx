@@ -9,39 +9,51 @@ import {
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import Button from "@mui/material/Button";
+import { AttendeStatusEnum } from "../../services/service/service.interface";
 
 const AttendeeList = (props: any) => {
   const actionButtons = (row: any) => {
-    if (!row.status) {
-      return (
-        <React.Fragment>
-          <TableCell align="right">
-            <Button
-              onClick={() => {
-                props.acceptAction(row.id);
-              }}
-              size="small"
-              variant="outlined"
-              color={"success"}
-            >
-              Accept
-            </Button>
-          </TableCell>
-          <TableCell align="right">
-            <Button
-              onClick={() => {
-                props.declineAction(row.id);
-              }}
-              size="small"
-              variant="outlined"
-              color={"error"}
-            >
-              Decline
-            </Button>
-          </TableCell>
-        </React.Fragment>
-      );
-    }
+    return (
+      <React.Fragment>
+        <TableCell align="right">
+          <Button
+            onClick={() => {
+              props.updateAction(
+                row.id,
+                AttendeStatusEnum.Approved,
+                row.handshakeStatus
+              );
+            }}
+            size="small"
+            variant="outlined"
+            color={"success"}
+          >
+            Accept
+          </Button>
+        </TableCell>
+        <TableCell align="right">
+          <Button
+            onClick={() => {
+              props.updateAction(
+                row.id,
+                AttendeStatusEnum.Rejected,
+                row.handshakeStatus
+              );
+            }}
+            size="small"
+            variant="outlined"
+            color={"error"}
+          >
+            Decline
+          </Button>
+        </TableCell>
+      </React.Fragment>
+    );
+  };
+  const status = (row: any) => {
+    if (row.status === AttendeStatusEnum.Rejected) return "Rejected";
+    if (row.status === AttendeStatusEnum.Approved) return "Approved";
+    if (row.status === AttendeStatusEnum.Waiting) return "Waiting";
     return;
   };
   const table = (data: any) => {
@@ -66,9 +78,7 @@ const AttendeeList = (props: any) => {
                 </TableCell>
                 <TableCell align="right">{row.name}</TableCell>
                 <TableCell align="right">{row.surname}</TableCell>
-                <TableCell align="right">
-                  {row.status === true ? "Accepted" : "Waiting"}
-                </TableCell>
+                <TableCell align="right">{status(row)}</TableCell>
                 {actionButtons(row)}
               </TableRow>
             ))}

@@ -46,7 +46,6 @@ export const GoogleMaps = (props: any) => {
       navigator.geolocation.getCurrentPosition(showPosition, showError);
     } else {
     }
-    console.log(position);
   };
 
   function showPosition(position: any) {

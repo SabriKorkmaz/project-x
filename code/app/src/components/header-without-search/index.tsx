@@ -6,10 +6,7 @@ import { IHeader } from "../header/interface";
 import { SideBar } from "../side-bar";
 
 export default function HeaderWithoutSearch(props: IHeader) {
-  useEffect(() => {
-    console.log("user");
-    console.log(props.user);
-  }, [props.user]);
+  useEffect(() => {}, [props.user]);
   return (
     <React.Fragment>
       <Container maxWidth="xl" style={{ paddingTop: "100px" }}>

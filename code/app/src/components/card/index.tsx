@@ -29,7 +29,6 @@ export default function MediaCard(props: any) {
         <Button
           size="small"
           onClick={() => {
-            console.log(props);
             if (props.type == ModalType.Meetup)
               navigate("/meetup/detail", { state: { id: props.data.id } });
             if (props.type === ModalType.Service) {

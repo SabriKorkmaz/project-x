@@ -15,6 +15,13 @@ export abstract class ServiceService {
     }
   }
 
+  static async updateStatus(request: Partial<ServiceModel>) {
+    return await BaseService.postData(
+      request,
+      this.baseUrl + "updateStatus/" + request.id
+    );
+  }
+
   static async delete(id: number) {
     return await BaseService.delete(id, this.baseUrl + "delete/" + id);
   }

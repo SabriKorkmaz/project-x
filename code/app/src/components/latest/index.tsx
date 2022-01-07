@@ -18,7 +18,6 @@ export default function Latest(props: any) {
         result = await ServiceService.getLatest<any>();
       }
       setData(result.data);
-      console.log(result);
     };
     fetchData();
   }, []);

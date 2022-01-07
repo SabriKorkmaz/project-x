@@ -24,6 +24,13 @@ export abstract class UserService {
     return await BaseService.getDataFromApi<T>(id, this.baseUrl + "get/" + id);
   }
 
+  static async getHistory<T>(id: number) {
+    return await BaseService.getDataFromApi<T>(
+      id,
+      this.baseUrl + "getHistory/" + id
+    );
+  }
+
   static async registerMeetup<T>(request: any) {
     return await BaseService.postData<T>(
       request,
@@ -73,10 +80,17 @@ export abstract class UserService {
     );
   }
 
-  static async acceptRegisteredService<T>(id: any) {
+  static async updateRegisteredService<T>(request: any) {
     return await BaseService.postData<T>(
-      id,
-      this.baseUrl + "acceptRegisteredService/" + id
+      request,
+      this.baseUrl + "updateRegisteredService"
+    );
+  }
+
+  static async updateRegisteredMeetup<T>(request: any) {
+    return await BaseService.postData<T>(
+      request,
+      this.baseUrl + "updateRegisteredMeetup"
     );
   }
 

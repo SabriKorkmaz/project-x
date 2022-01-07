@@ -55,17 +55,16 @@ const DogTag = (props: IDogTag) => {
     if (props.type === ModalType.Service) {
       return (
         <Typography sx={{ fontSize: 12 }} color="text.secondary" gutterBottom>
-          Credit
+          Hours
         </Typography>
       );
     } else return "";
   };
   let creditValue = () => {
-    console.log(props);
     if (props.type === ModalType.Service) {
       return (
         <Typography sx={{ fontSize: 12 }} gutterBottom>
-          {props.data.credit}
+          {props.data.hours}
         </Typography>
       );
     } else return "";
@@ -102,9 +101,6 @@ const DogTag = (props: IDogTag) => {
           </CardContent>
           <CardContent>
             {creditValue()}
-            <Typography sx={{ fontSize: 12 }} gutterBottom>
-              {props.data.duration}
-            </Typography>
             <Typography sx={{ fontSize: 12 }} gutterBottom>
               {props.data.date}
             </Typography>

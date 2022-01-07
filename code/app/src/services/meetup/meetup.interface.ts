@@ -5,7 +5,6 @@ export interface MeetupModel extends BaseModel {
   description: string;
   title: string;
   capacity: number;
-  duration: string;
   imageUrl: string;
   address: string;
   date: any;
@@ -13,9 +12,26 @@ export interface MeetupModel extends BaseModel {
   longitude: string;
   latitude: string;
   owner: Partial<UserModel>;
+  status: StatusEnum | string;
 }
 
 export enum StatusEnum {
-  WaitingForApprove = 1,
+  Pending = 1,
   Completed = 2,
+  NotCompleted = 3,
+}
+
+export enum AttendeStatusEnum {
+  Waiting = 1,
+  Approved = 2,
+  Rejected = 3,
+}
+
+export interface MeetupAttendees extends BaseModel {
+  status: AttendeStatusEnum;
+  meetupId: number;
+  userId: number;
+  createdDate: string;
+  hours: number;
+  handshakeStatus: StatusEnum;
 }

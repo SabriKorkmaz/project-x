@@ -16,7 +16,6 @@ const ProfileDetail = observer((props: any) => {
     let fetchData = async () => {
       let result = await UserService.getUser<any>(id);
       setResult(result);
-      console.log(result);
     };
     fetchData();
   }, []);
@@ -42,7 +41,7 @@ const ProfileDetail = observer((props: any) => {
             Profile
           </Typography>
 
-          <UpdateProfile data={result?.data} />
+          <UpdateProfile auth={props.auth} data={result?.data} />
         </div>
         <Divider variant="middle" style={{ margin: 0 }} />
       </Box>

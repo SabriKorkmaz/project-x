@@ -24,6 +24,7 @@ import MeetupDetail from "./routes/meetup/detail";
 import ServiceDetail from "./routes/service/detail";
 import { ModalType } from "./components/create-modal/modal-type.enum";
 import ProfileDetail from "./routes/profile/detail";
+import HistoryDetail from "./routes/profile/history";
 
 export const SnackbarContext = createContext({});
 let isAuth = () => {
@@ -33,7 +34,11 @@ const ProfileLayout = (props: any) => {
   return (
     <HeaderWithoutSearch auth={props.auth} user={props.user}>
       <Routes>
-        <Route path="/detail" element={<ProfileDetail />} />
+        <Route
+          path="/detail"
+          element={<ProfileDetail auth={props.auth} user={props.user} />}
+        />
+        <Route path="/history" element={<HistoryDetail />} />
         <Route path="/services" element={<Services />} />
         <Route path="/meetups" element={<Meetups />} />
       </Routes>
@@ -139,7 +144,7 @@ const AllRoute = observer(() => {
   }, []);
 
   return (
-    <div>
+    <div style={{ paddingBottom: 200 }}>
       <Routes>
         <Route
           path="/"

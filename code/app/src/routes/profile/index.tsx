@@ -12,6 +12,7 @@ import { BaseService } from "../../services/base/base.service";
 import Modal from "@mui/material/Modal";
 import * as React from "react";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import MainStore from "../../stores";
 
 const style = {
   position: "absolute" as "absolute",
@@ -71,6 +72,19 @@ export default function UpdateProfile(props: any) {
     }, 1333);
   };
 
+  let editButton = () => {
+    if (!props.auth) return;
+    return (
+      <Button
+        variant="outlined"
+        size="small"
+        endIcon={<ModeEditIcon />}
+        onClick={handleOpen}
+      >
+        Edit Profile
+      </Button>
+    );
+  };
   const onFileChange = (event: any) => {
     setFile(event.target.files[0]);
   };
@@ -94,18 +108,12 @@ export default function UpdateProfile(props: any) {
       open: true,
       type: result.isSuccess ? "success" : "error",
     });
+    await MainStore.updateUser();
   };
 
   return (
     <div>
-      <Button
-        variant="outlined"
-        size="small"
-        endIcon={<ModeEditIcon />}
-        onClick={handleOpen}
-      >
-        Edit Profile
-      </Button>
+      {editButton()}
 
       <Modal
         open={open}

@@ -33,27 +33,29 @@ class Service(db.Model):
     __tablename__ = 'service'
 
     id = db.Column(db.Integer, primary_key=True)
+    status = db.Column(db.Integer, unique=False)
     title = db.Column(db.String(120), unique=False)
     description = db.Column(db.String(840), unique=False)
     capacity = db.Column(db.Integer, unique=False)
     longitude = db.Column(db.String(120), unique=False)
     latitude = db.Column(db.String(120), unique=False)
     address = db.Column(db.String(2120), unique=False)
-    credit = db.Column(db.Integer, unique=False)
+    hours = db.Column(db.Integer, unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
     date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
     comments = db.relationship('UserServiceComment', backref='Service', lazy='dynamic')
 
-    def __init__(self, title, description, longitude, latitude, capacity, credit, address, imageUrl, date,
+    def __init__(self, title,status, description, longitude, latitude, capacity, hours, address, imageUrl, date,
                  userId, createdDate):
         self.title = title
+        self.status = status
         self.description = description
         self.capacity = capacity
         self.longitude = longitude
         self.latitude = latitude
-        self.credit = credit
+        self.hours = hours
         self.address = address
         self.imageUrl = imageUrl
         self.date = date
@@ -67,21 +69,18 @@ class UserService(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     serviceId = db.Column(db.Integer, db.ForeignKey('service.id'))
-    isUserCompleted = db.Column(db.Boolean, unique=False, default=False)
-    isOwnerCompleted = db.Column(db.Boolean, unique=False, default=False)
-    status = db.Column(db.Boolean, unique=False, default=False)
+    status = db.Column(db.Integer, unique=False, default=False)
+    handshakeStatus = db.Column(db.Integer, unique=False, default=False)
+    hours = db.Column(db.Integer, unique=False, default=False)
     user = db.relationship('User', backref='UserService', lazy=True, uselist=False)
     createdDate = db.Column(db.DateTime, unique=False)
-    serviceStatus = db.Column(db.Integer, unique=False)
 
-    def __init__(self, userId, serviceId, credit, status, isUserCompleted,isOwnerCompleted,createdDate, serviceStatus):
+    def __init__(self, userId, serviceId, hours, status,createdDate, handshakeStatus):
         self.userId = userId
-        self.isUserCompleted = isUserCompleted
-        self.isOwnerCompleted = isOwnerCompleted
-        self.serviceStatus = serviceStatus
+        self.handshakeStatus = handshakeStatus
         self.serviceId = serviceId
         self.status = status
-        self.credit = credit
+        self.hours = hours
         self.createdDate = createdDate
 
 
@@ -91,19 +90,15 @@ class UserMeetup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     meetupId = db.Column(db.Integer, db.ForeignKey('meetup.id'))
-    isUserCompleted = db.Column(db.Boolean, unique=False, default=False)
-    isOwnerCompleted = db.Column(db.Boolean, unique=False, default=False)
-    status = db.Column(db.Boolean, unique=False, default=False)
+    handshakeStatus = db.Column(db.Integer, unique=False, default=False)
+    status = db.Column(db.Integer, unique=False, default=False)
     user = db.relationship('User', backref='UserMeetup', lazy=True, uselist=False)
     createdDate = db.Column(db.DateTime, unique=False)
-    serviceStatus = db.Column(db.Integer, unique=False)
 
-    def __init__(self, userId, meetupId, status, createdDate, serviceStatus,isUserCompleted,isOwnerCompleted):
+    def __init__(self, userId, meetupId, status, createdDate, handshakeStatus):
         self.userId = userId
+        self.handshakeStatus = handshakeStatus
         self.meetupId = meetupId
-        self.serviceStatus = serviceStatus
-        self.isUserCompleted = isUserCompleted
-        self.isOwnerCompleted = isOwnerCompleted
         self.status = status
         self.createdDate = createdDate
 
@@ -158,19 +153,19 @@ class Meetup(db.Model):
     longitude = db.Column(db.String(120), unique=False)
     latitude = db.Column(db.String(120), unique=False)
     address = db.Column(db.String(2220), unique=False)
-    duration = db.Column(db.String(120), unique=False)
     imageUrl = db.Column(db.String(120), unique=False)
-
+    status = db.Column(db.Integer, unique=False)
     date = db.Column(db.String(120), unique=False)
     userId = db.Column(db.Integer, db.ForeignKey('user.id'))
     createdDate = db.Column(db.DateTime, unique=False)
     comments = db.relationship('UserMeetupComment', backref='Meetup', lazy='dynamic')
-    def __init__(self, title, description, duration, longitude, latitude, capacity, address, imageUrl, date, userId,
+    def __init__(self, title,status, description, longitude, latitude, capacity, address, imageUrl, date, userId,
                  createddate):
         self.title = title
+        self.status = status
         self.description = description
         self.capacity = capacity
-        self.duration = duration
+
         self.longitude = longitude
         self.latitude = latitude
         self.address = address

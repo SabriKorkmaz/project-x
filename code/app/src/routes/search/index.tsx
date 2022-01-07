@@ -60,7 +60,7 @@ export const Search = (props: any) => {
             title: item.title,
             imageUrl: item.imageUrl,
             date: item.date,
-            credit: item.credit,
+            hours: item.hours,
 
             capacity: item.capacity,
             description: item.description,

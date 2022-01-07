@@ -7,7 +7,6 @@ from models.index import UserMeetup,UserService,Meetup,Service
 from func.token import token_required
 from shared.index import api_secret
 from flask import request, jsonify, make_response
-from sqlalchemy.sql import text
 from flask import Blueprint
 
 from models.index import db
@@ -62,7 +61,7 @@ def get_one_user( id):
 
         comments = []
         for comment in meetup.comments:
-            commentvalue = {"id":comment.id,"date":comment.createdDate,"comment":comment.comment, "rate":comment.rate,
+            commentvalue = {"id":comment.id, "date":comment.createdDate,"comment":comment.comment, "rate":comment.rate,
                             "owner":{"name":comment.user.name,"surname":comment.user.surname}}
 
             comments.append(commentvalue)
@@ -72,7 +71,7 @@ def get_one_user( id):
         value = {'title': meetup.title,
                  "userId": meetup.userId,
                  'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
-                 'duration': meetup.duration, "id": meetup.id, "comments": comments,
+                 "id": meetup.id, "comments": comments,
                  'date': meetup.date}
         meetups.append(value)
     user_data['meetups'] = meetups
@@ -80,19 +79,22 @@ def get_one_user( id):
     services = []
 
     for service in user.services:
-        value = {'title': service.title, 'description': service.description,
-                 "credit": service.credit, "userId": service.userId,
-                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-              "id": service.id,"comments": comments,
-                 'date': service.date}
-        services.append(value)
-
         comments = []
         for comment in service.comments:
             commentvalue = {"id":comment.id,"date":comment.createdDate,"comment":comment.comment, "rate":comment.rate,
                             "owner":{"name":comment.user.name,"surname":comment.user.surname}}
 
             comments.append(commentvalue)
+
+        value = {'title': service.title, 'description': service.description,
+                 "hours": service.hours, "userId": service.userId,
+                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                 "id": service.id,
+                 "comments": comments,
+                 'date': service.date}
+        services.append(value)
+
+
 
     user_data['services'] = services
 
@@ -174,6 +176,7 @@ def login():
         user_data['name'] = user.name
         user_data['admin'] = user.admin
         user_data['credit'] = user.credit
+        user_data["profileImg"] = user.profileImg
 
         meetups = []
 
@@ -181,7 +184,7 @@ def login():
             value = {'title': meetup.title, 'description': meetup.description,
                      "userId": meetup.userId,
                      'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
-                     'duration': meetup.duration, "id": meetup.id,
+                     "id": meetup.id,
                      'date': meetup.date}
             meetups.append(value)
         user_data['meetups'] = meetups
@@ -190,7 +193,7 @@ def login():
 
         for service in user.services:
             value = {'title': service.title, 'description': service.description,
-                     "credit": service.credit, "userId": service.userId,
+                     "hours": service.hours, "userId": service.userId,
                      'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
                      "id": service.id,
                      'date': service.date}
@@ -224,10 +227,8 @@ def save_user_meetup(current_user):
     user_meetup = UserMeetup(
         userId=data['userId'],
         meetupId=data['meetupId'],
-        status=0,
-        isUserCompleted=False,
-        isOwnerCompleted=False,
-        serviceStatus=1,
+        status=1,
+        handshakeStatus=1,
         createdDate=datetime.datetime.now(),
     )
     db.session.add(user_meetup)
@@ -246,12 +247,45 @@ def get_registered_meetup(current_user,id):
             value = {'status': usermeetup.status,
                      "userId": usermeetup.userId,
                      "id": usermeetup.id,
+                     "handshakeStatus":usermeetup.handshakeStatus,
                      "name": usermeetup.user.name,
                      "surname": usermeetup.user.surname,
                      'meetupId': usermeetup.meetupId}
             data.append(value)
 
         return jsonify({'data': data, "isSuccess": 1})
+
+
+@userRoute.route('/user/getHistory/<id>', methods=['GET'])
+@token_required
+def get_history(current_user,id):
+    userMeetup = UserMeetup.query.filter_by(userId=id)
+    meetups = []
+
+    userService = UserService.query.filter_by(userId=id)
+    services = []
+
+    for userservice in userService:
+        value = {'status': userservice.status,
+                 "userId": userservice.userId,
+                 "id": userservice.id,
+                 "handshakeStatus": userservice.handshakeStatus,
+                 "name": userservice.user.name,
+                 "surname": userservice.user.surname,
+                 'serviceId': userservice.serviceId}
+        services.append(value)
+
+    for usermeetup in userMeetup:
+        value = {'status': usermeetup.status,
+                 "userId": usermeetup.userId,
+                 "id": usermeetup.id,
+                 "handshakeStatus": usermeetup.handshakeStatus,
+                 "name": usermeetup.user.name,
+                 "surname": usermeetup.user.surname,
+                 'meetupId': usermeetup.meetupId}
+        meetups.append(value)
+
+    return jsonify({'data': {"meetups":meetups,"services":services}, "isSuccess": 1})
 
 
 @userRoute.route('/user/getMeetupAttendees/<id>', methods=['GET'])
@@ -264,8 +298,7 @@ def get_meetup_attendees(current_user,id):
             value = {'status': usermeetup.status,
                      "userId": usermeetup.userId,
                      "id": usermeetup.id,
-                     "isUserCompleted": usermeetup.isUserCompleted,
-                     "isOwnerCompleted": usermeetup.isOwnerCompleted,
+                     "handshakeStatus":usermeetup.handshakeStatus,
                      "name": usermeetup.user.name,
                      "surname": usermeetup.user.surname,
                      'meetupId': usermeetup.meetupId}
@@ -295,15 +328,15 @@ def update_user(current_user,id):
     return jsonify({'message': 'User updated!', "isSuccess": 1})
 
 
-@userRoute.route('/user/acceptRegisteredMeetup/<id>', methods=['POST'])
+@userRoute.route('/user/updateRegisteredMeetup', methods=['POST'])
 @token_required
-def update_meetup(current_user,id):
+def update_meetup(current_user):
     data = request.get_json()
 
-    meetup: object = UserMeetup.query.filter_by(id=id).first()
+    meetup: object = UserMeetup.query.filter_by(id=data['id']).first()
 
-    meetup.status = True
-
+    meetup.status = data["status"]
+    meetup.handshakeStatus = data["handshakeStatus"]
     db.session.commit()
 
     return jsonify({'message': 'Meetup request is accepted!', "isSuccess": 1})
@@ -316,12 +349,13 @@ def save_user_service(current_user):
     user_service = UserService(
         userId=data['userId'],
         serviceId=data['serviceId'],
-        credit=data['credit'],
-        status=False,
+        hours=data['hours'],
+        status=1,
+        handshakeStatus=1,
         createdDate=datetime.datetime.now(),
     )
     user = User.query.filter_by(id=data['userId']).first()
-    user.credit = user.credit - data['credit']
+    user.credit = user.credit - data['hours']
 
     db.session.add(user_service)
     db.session.commit()
@@ -337,7 +371,7 @@ def delete_user_service(current_user, id):
 
     user = User.query.filter_by(id=userService.userId).first()
 
-    user.credit = user.credit + userService.credit
+    user.credit = user.credit + userService.hours
 
     if not userService:
         return jsonify({'message': 'No userService found!'})
@@ -358,6 +392,7 @@ def get_service_attendees(current_user,id):
             value = {'status': userservice.status,
                      "userId": userservice.userId,
                      "id": userservice.id,
+                     "handshakeStatus": userservice.handshakeStatus,
                      "name": userservice.user.name,
                      "surname": userservice.user.name,
                      'serviceId': userservice.serviceId}
@@ -366,20 +401,25 @@ def get_service_attendees(current_user,id):
         return jsonify({'data': data, "isSuccess": 1})
 
 
-@userRoute.route('/user/acceptRegisteredService/<id>', methods=['POST'])
+@userRoute.route('/user/updateRegisteredService', methods=['POST'])
 @token_required
-def update_service(current_user,id):
+def update_service(current_user):
     data = request.get_json()
 
-    userservice: object = UserService.query.filter_by(id=id).first()
+    userservice: object = UserService.query.filter_by(id=data['id']).first()
 
-    userservice.status = True
-    service = Service.query.filter_by(id=userservice.serviceId).first()
-    user = User.query.filter_by(id = service.userId).first()
-    user.credit = user.credit + service.credit
+    userservice.status = data["status"]
+    userservice.handshakeStatus = data["handshakeStatus"]
+
+    if data["exchange"]:
+        service = Service.query.filter_by(id=userservice.serviceId).first()
+        user = User.query.filter_by(id=service.userId).first()
+
+        user.credit = user.credit + userservice.hours
+
     db.session.commit()
 
-    return jsonify({'message': 'Service request is accepted!', "isSuccess": 1})
+    return jsonify({'message': 'Service request is updated!', "isSuccess": 1})
 
 
 @userRoute.route('/user/search', methods=['POST'])
@@ -393,7 +433,7 @@ def search():
 
         for service in services:
             value = {'title': service.title, 'description': service.description,
-                     "credit": service.credit, "userId": service.userId,
+                     "hours": service.hours, "userId": service.userId,
                      'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
                      "id": service.id,
                      'date': service.date}
@@ -404,7 +444,7 @@ def search():
         for meetup in meetups:
             value = {'imageUrl': meetup.imageUrl, 'title': meetup.title, "description": meetup.description,
                      'address': meetup.address,
-                     'duration': meetup.duration, 'userId': meetup.userId,
+                     'userId': meetup.userId,
                      'capacity': meetup.capacity, "id": meetup.id,
                      'date': meetup.date}
             data_meetup.append(value)
@@ -461,7 +501,7 @@ def advancedSearch():
 
         for service in services:
             value = {'title': service.title, 'description': service.description,
-                     "credit": service.credit, "userId": service.userId,
+                     "hours": service.hours, "userId": service.userId,
                      'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
                      "id": service.id,"distance":math.floor(service.distance),
                      'date': service.date}
@@ -472,7 +512,7 @@ def advancedSearch():
         for meetup in meetups:
             value = {'imageUrl': meetup.imageUrl, 'title': meetup.title, "description": meetup.description,
                      'address': meetup.address,"distance":math.floor(meetup.distance),
-                     'duration': meetup.duration, 'userId': meetup.userId,
+                     'userId': meetup.userId,
                      'capacity': meetup.capacity, "id": meetup.id,
                      'date': meetup.date}
             data_meetup.append(value)

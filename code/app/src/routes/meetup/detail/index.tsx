@@ -4,30 +4,36 @@ import { Box, Card, CardContent, Divider, Fab } from "@material-ui/core";
 import Typography from "@mui/material/Typography";
 import AddIcon from "@mui/icons-material/Add";
 import { CircularProgress, Link } from "@mui/material";
-import { ServiceModel } from "../../../services/service/service.interface";
-import { ResponseModel } from "../../../services/base/response.interface";
-import { MeetupService } from "../../../services/meetup/meetup.service";
 import { ModalType } from "../../../components/create-modal/modal-type.enum";
 import DogTag from "../../../components/dog-tag";
 import { HeaderImg } from "../../../components/header-img";
 import MainStore from "../../../stores/index";
 import { observer } from "mobx-react";
-import { MeetupModel } from "../../../services/meetup/meetup.interface";
 import { SnackbarContext } from "../../../index";
-import { UserService } from "../../../services/user/user.service";
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AttendeeList from "../../../components/attendee-list";
 import CheckIcon from "@mui/icons-material/Check";
 import CommentModal from "../../../components/comment-modal";
+import {
+  AttendeStatusEnum,
+  MeetupAttendees,
+  MeetupModel,
+  StatusEnum,
+} from "../../../services/meetup/meetup.interface";
+import { UserService } from "../../../services/user/user.service";
+import { ResponseModel } from "../../../services/base/response.interface";
+import { MeetupService } from "../../../services/meetup/meetup.service";
 
 const MeetupDetail = observer((props: any) => {
   const [load, setLoad] = useState(false);
-  const [data, setData] = useState({} as ServiceModel);
+  const [data, setData] = useState({} as MeetupModel);
   const [owner, setOwner] = useState(false);
 
-  const [meetupAttendees, setMeetupAttendees] = useState([] as any);
+  const [meetupAttendees, setMeetupAttendees] = useState(
+    [] as MeetupAttendees[]
+  );
   const { state } = useLocation();
-  const { id } = state;
+  const { id } = state || 0;
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   let navigate = useNavigate();
@@ -41,33 +47,29 @@ const MeetupDetail = observer((props: any) => {
     }
   };
 
-  let disableRequestText = () => {
-    if (requestedMeetup().exist && requestedMeetup().status)
-      return "Request is accepted";
-    if (requestedMeetup().exist && !requestedMeetup().status)
-      return "Request is waiting";
-    return "Request";
+  let setMeetupDetail = async () => {
+    let result = await MeetupService.get<ResponseModel<MeetupModel>>(id);
+    setData(result.data);
+    setLoad(true);
   };
-
   let requestedMeetup = () => {
     let result = meetupAttendees?.find((k: any) => k.userId === props.user?.id);
     return {
       exist: result?.id !== undefined,
       status: result?.status,
+      handshakeStatus: result?.handshakeStatus,
       id: result?.id,
     };
   };
   let update = async () => {
     await getMeetupAttendees(id);
+    await setMeetupDetail();
     await MainStore.updateUser();
   };
 
   useEffect(() => {
-    let setMeetupDetail = async () => {
-      let result = await MeetupService.get<ResponseModel<ServiceModel>>(id);
-      setData(result.data);
-      setLoad(true);
-    };
+    if (!id) navigate("/");
+
     getMeetupAttendees(id);
     setMeetupDetail();
   }, []);
@@ -83,6 +85,73 @@ const MeetupDetail = observer((props: any) => {
     }
   }, [props.user]);
 
+  let showRequestButton = () => {
+    return props.auth && !owner && !requestedMeetup().exist;
+  };
+
+  let datePassed = () => {
+    let currentDate = new Date();
+    let activeDate = new Date(data.date);
+
+    return currentDate > activeDate;
+  };
+
+  let showCancelRequestButton =
+    props.auth &&
+    !owner &&
+    requestedMeetup().exist &&
+    requestedMeetup().status === AttendeStatusEnum.Waiting;
+
+  let showHandshakeButtonForOwner =
+    props.auth && owner && data.status === StatusEnum.Pending && datePassed();
+
+  let showHandshakeButtonForAttendee =
+    props.auth &&
+    !owner &&
+    data.status === StatusEnum.Completed &&
+    requestedMeetup().handshakeStatus === StatusEnum.Pending &&
+    datePassed();
+
+  let showCommentButton =
+    props.auth &&
+    !owner &&
+    data.status === StatusEnum.Completed &&
+    requestedMeetup().status === AttendeStatusEnum.Approved &&
+    requestedMeetup().handshakeStatus !== StatusEnum.Pending;
+
+  let handshakeButtonForOwnerRequest = async () => {
+    let result = await MeetupService.updateStatus({
+      id: data.id,
+      status: StatusEnum.Completed,
+    });
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
+    if (result.isSuccess) {
+      await update();
+    }
+  };
+  let handshakeButtonForAttendeeRequest = async (handshakeStatus: any) => {
+    let result = await UserService.updateRegisteredMeetup<ResponseModel<any>>({
+      id: id,
+      status: requestedMeetup().status,
+      handshakeStatus: handshakeStatus,
+    });
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
+    if (result.isSuccess) {
+      await update();
+    }
+  };
   let cancelRequest = async () => {
     let result = await UserService.deleteRegisteredMeetup(requestedMeetup().id);
     if (result) {
@@ -97,14 +166,6 @@ const MeetupDetail = observer((props: any) => {
     }
   };
   let handleRequest = async (id: number) => {
-    if (data.credit >= props.user.credit) {
-      setSnack({
-        message: "You dont have enough credits",
-        open: true,
-        type: "error",
-      });
-      return;
-    }
     let result = await UserService.registerMeetup<ResponseModel<MeetupModel>>({
       userId: props.user.id,
       meetupId: id,
@@ -121,21 +182,16 @@ const MeetupDetail = observer((props: any) => {
     }
   };
 
-  const acceptAction = async (id: number) => {
-    let result = await UserService.acceptRegisteredMeetup<ResponseModel<any>>(
-      id
-    );
-    if (result) {
-      setSnack({
-        message: result.message,
-        open: true,
-        type: result.isSuccess ? "success" : "error",
-      });
-    }
-    await update();
-  };
-  const declineAction = async (id: number) => {
-    let result = await UserService.deleteRegisteredMeetup(id);
+  const updateAction = async (
+    id: number,
+    status: AttendeStatusEnum,
+    handshakeStatus: AttendeStatusEnum
+  ) => {
+    let result = await UserService.updateRegisteredMeetup<ResponseModel<any>>({
+      id: id,
+      status: status,
+      handshakeStatus: handshakeStatus,
+    });
     if (result) {
       setSnack({
         message: result.message,
@@ -147,6 +203,7 @@ const MeetupDetail = observer((props: any) => {
   };
 
   const requestButton = () => {
+    if (!showRequestButton()) return;
     return (
       <Fab
         onClick={async () => {
@@ -161,11 +218,12 @@ const MeetupDetail = observer((props: any) => {
         variant="extended"
       >
         <AddIcon sx={{ mr: 1 }} />
-        {disableRequestText()}
+        Request
       </Fab>
     );
   };
   const cancelButton = () => {
+    if (!showCancelRequestButton) return;
     return (
       <Fab
         onClick={async () => {
@@ -184,11 +242,12 @@ const MeetupDetail = observer((props: any) => {
       </Fab>
     );
   };
-  const handshakeButton = () => {
+  const handshakeButtonForOwner = () => {
+    if (!showHandshakeButtonForOwner) return;
     return (
       <Fab
         onClick={async () => {
-          await cancelRequest();
+          await handshakeButtonForOwnerRequest();
         }}
         style={{
           width: "200px",
@@ -198,15 +257,34 @@ const MeetupDetail = observer((props: any) => {
         variant="extended"
       >
         <CheckIcon sx={{ mr: 1 }} />
-        Mark as completed
+        Mark as completed for owner
+      </Fab>
+    );
+  };
+  const handshakeButtonForAttendee = (status: any, text: string) => {
+    if (!showHandshakeButtonForAttendee) return;
+    return (
+      <Fab
+        onClick={async () => {
+          await handshakeButtonForAttendeeRequest(status);
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        variant="extended"
+      >
+        <CheckIcon sx={{ mr: 1 }} />
+        {text}
       </Fab>
     );
   };
   const commentButton = (data: any) => {
-    console.log(data);
+    if (!showCommentButton) return;
     return (
       <CommentModal
-        type={ModalType.Meetup}
+        type={ModalType.Service}
         data={data}
         buttonName="Submit a review"
       />
@@ -216,11 +294,33 @@ const MeetupDetail = observer((props: any) => {
   const attendeeList = () => {
     if (owner) {
       return (
-        <AttendeeList
-          acceptAction={acceptAction}
-          declineAction={declineAction}
-          data={meetupAttendees}
-        />
+        <AttendeeList updateAction={updateAction} data={meetupAttendees} />
+      );
+    }
+    return;
+  };
+
+  let status = (status: any) => {
+    if (status === null || status === undefined) return "";
+    if (status === AttendeStatusEnum.Waiting) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Waiting
+        </Fab>
+      );
+    }
+    if (status === AttendeStatusEnum.Approved) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Approved
+        </Fab>
+      );
+    }
+    if (status === AttendeStatusEnum.Rejected) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Rejected
+        </Fab>
       );
     }
     return;
@@ -240,29 +340,48 @@ const MeetupDetail = observer((props: any) => {
         <Divider variant="middle" style={{ margin: 0 }} />
         <HeaderImg data={data} />
         <Card style={{ minWidth: 275, display: "flex", marginBottom: 20 }}>
-          <CardContent>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              Owner:
-              <Link
-                onClick={() => {
-                  navigate("/profile/detail", { state: { id: data.owner.id } });
-                }}
-              >
-                {`${data.owner.name} ${data.owner.surname}`}
-              </Link>
-            </Typography>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              Description
-            </Typography>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              {data.description}
-            </Typography>
+          <CardContent
+            style={{
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  Owner:
+                  <Link
+                    onClick={() => {
+                      navigate("/profile/detail", {
+                        state: { id: data.owner.id },
+                      });
+                    }}
+                  >
+                    {`${data.owner.name} ${data.owner.surname}`}
+                  </Link>
+                </Typography>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  Description
+                </Typography>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  {data.description}
+                </Typography>
+              </div>
+              <div>{status(requestedMeetup().status)}</div>
+            </div>
           </CardContent>
         </Card>
-        <DogTag data={data} type={ModalType.Meetup} />
+        <DogTag data={data} type={ModalType.Service} />
         {requestButton()}
         {cancelButton()}
-        {handshakeButton()}
+        {handshakeButtonForOwner()}
+        {handshakeButtonForAttendee(StatusEnum.Completed, "Mark as Completed")}
         {commentButton(data)}
       </Box>
       {attendeeList()}

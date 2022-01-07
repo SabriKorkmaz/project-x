@@ -32,28 +32,27 @@ export const Search = () => {
   };
 
   /*  const getLocation = () => {
-                  if (navigator.geolocation) {
-                    navigator.geolocation.getCurrentPosition(showPosition, showError);
-                  } else {
-                  }
-                };
-  
-                const showPosition = (position: any) => {
-                  console.log(position);
-                };
-  
-                const handleGeolocation = () => {
-                  getLocation();
-                  return;
-                };
-  
-                function showError(error: any) {
-                  switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                      alert("Permission Denied");
-                      break;
-                  }
-                }*/
+                    if (navigator.geolocation) {
+                      navigator.geolocation.getCurrentPosition(showPosition, showError);
+                    } else {
+                    }
+                  };
+
+                  const showPosition = (position: any) => {
+                  };
+
+                  const handleGeolocation = () => {
+                    getLocation();
+                    return;
+                  };
+
+                  function showError(error: any) {
+                    switch (error.code) {
+                      case error.PERMISSION_DENIED:
+                        alert("Permission Denied");
+                        break;
+                    }
+                  }*/
 
   return (
     <React.Fragment>
@@ -98,7 +97,6 @@ export const Search = () => {
             marks={marks}
             onChange={(e, newValue) => {
               setDistance(newValue as number);
-              console.log(newValue);
             }}
             min={0}
             max={100}

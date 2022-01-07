@@ -23,8 +23,8 @@ def get_latest():
                  'address': meetup.address,
                  "longitude": meetup.longitude,
                  "latitude": meetup.latitude,
-
-                 'duration': meetup.duration,'userId': meetup.userId,
+                 "status": meetup.status,
+                 'userId': meetup.userId,
                  'capacity': meetup.capacity,"id": meetup.id,
                  'date': meetup.date}
         data.append(value)
@@ -44,8 +44,9 @@ def get_all_meetups(current_user, id):
         value = {'imageUrl': meetup.imageUrl, 'title': meetup.title,"description":meetup.description,
                  'address': meetup.address,
                  "longitude": meetup.longitude,
+                 "status": meetup.status,
                  "latitude": meetup.latitude,
-                 'duration': meetup.duration,'userId': meetup.userId,
+                 'userId': meetup.userId,
                  'capacity': meetup.capacity,"id": meetup.id,
                  'date': meetup.date}
         data.append(value)
@@ -63,8 +64,9 @@ def get_one_meetup(id):
     value = { 'title': meetup.title, 'description': meetup.description,
               "longitude": meetup.longitude,
               "latitude": meetup.latitude,
+              "status": meetup.status,
               "owner": {"id":user.id, "name":user.name, "surname":user.surname},
-              'duration': meetup.duration,"id": meetup.id,"userId":meetup.userId,
+              "id": meetup.id,"userId":meetup.userId,
               'capacity': meetup.capacity, 'address': meetup.address, 'imageUrl': meetup.imageUrl,
               'date': meetup.date}
 
@@ -94,7 +96,7 @@ def create_meetup(current_user):
         title=data['title'],
         description=data['description'],
         capacity=data['capacity'],
-        duration=data['duration'],
+        status=1,
         address=data['address'],
         longitude=data['longitude'],
         latitude=data['latitude'],
@@ -120,9 +122,9 @@ def update_meetup(current_user,id):
     meetup.description = data['description'],
     meetup.capacity = data['capacity'],
     meetup.address = data['address'],
+    meetup.status = data['status'],
     meetup.imageUrl = data['imageUrl'],
     meetup.date = data['date'],
-    meetup.duration = data['duration'],
 
     db.session.commit()
 
@@ -214,3 +216,17 @@ def get_all_meetups_comment(current_user, id):
         data.append(value)
 
     return jsonify({'data': data, "isSuccess": 1})
+
+
+@meetupRoute.route('/meetup/updateStatus/<id>', methods=['POST'])
+@token_required
+def update_service_status(current_user,id):
+    data = request.get_json()
+
+    meetup: object = Meetup.query.filter_by(id=id).first()
+
+    meetup.status = data['status']
+
+    db.session.commit()
+
+    return jsonify({'message': 'New service updated!', "isSuccess": 1})

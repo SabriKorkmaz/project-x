@@ -8,9 +8,7 @@ import { useState } from "react";
 //@observer
 export const Recovery = (props: any) => {
   let [email, setEmail] = useState("");
-  let handleClick = () => {
-    console.log(email);
-  };
+  let handleClick = () => {};
 
   //const { setSnack } = useContext(SnackbarContext);
   return (

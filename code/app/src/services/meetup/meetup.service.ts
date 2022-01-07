@@ -1,11 +1,19 @@
 import { BaseService } from "../base/base.service";
 import { MeetupModel } from "./meetup.interface";
+import { ServiceModel } from "../service/service.interface";
 
 export abstract class MeetupService {
   private static readonly baseUrl = "meetup/";
 
   static async upload(formData: FormData) {
     return await BaseService.postData(formData, this.baseUrl + "upload");
+  }
+
+  static async updateStatus(request: Partial<ServiceModel>) {
+    return await BaseService.postData(
+      request,
+      this.baseUrl + "updateStatus/" + request.id
+    );
   }
 
   static async save(request: MeetupModel) {

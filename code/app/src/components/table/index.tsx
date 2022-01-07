@@ -49,20 +49,7 @@ export default function TableList(props: ITableList) {
     }
     return "";
   };
-  let deleteColumn = () => {
-    return props.showDeleteButton ? (
-      <TableCell align="right">Delete </TableCell>
-    ) : (
-      ""
-    );
-  };
-  let editColumn = () => {
-    return props.showEditButton ? (
-      <TableCell align="right">Edit</TableCell>
-    ) : (
-      ""
-    );
-  };
+
   let editButton = (item: any) => {
     return props.showEditButton ? (
       <CreateModal
@@ -125,10 +112,6 @@ export default function TableList(props: ITableList) {
             {titles?.map((item: string, index: number) => {
               return <TableCell key={index}>{item.toUpperCase()}</TableCell>;
             })}
-            {deleteColumn()}
-
-            {editColumn()}
-            <TableCell align="right">Detail</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>

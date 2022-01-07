@@ -11,9 +11,7 @@ import { useNavigate } from "react-router-dom";
 
 export const RecentJobs = (props: any) => {
   let navigate = useNavigate();
-  useEffect(() => {
-    console.log(props);
-  }, [props.data]);
+  useEffect(() => {}, [props.data]);
   return (
     <React.Fragment>
       <div style={{ display: "flex", flexDirection: "column" }}>

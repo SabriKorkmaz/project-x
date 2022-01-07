@@ -17,7 +17,8 @@ def get_latest():
 
     for service in services:
         value = {'title': service.title, 'description': service.description,
-                 "credit": service.credit,"userId": service.userId,
+                 "hours": service.hours,"userId": service.userId,
+                 "status": service.status,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
                   "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
@@ -34,7 +35,7 @@ def get_all_services(current_user, id):
 
     for service in services:
         value = {'title': service.title, 'description': service.description,
-                 "credit": service.credit,"userId": service.userId,
+                 "hours": service.hours,"userId": service.userId,"status":service.status,
                  'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
                  "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
                  'date': service.date}
@@ -50,10 +51,10 @@ def get_one_service(id):
     if not service:
         return jsonify({'message': 'No service found!', "isSuccess": 0})
 
-    value = {'title': service.title, 'description': service.description, 'credit': service.credit,
+    value = {'title': service.title, 'description': service.description, 'hours': service.hours,"userId":service.userId,
              'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
-             "owner": {"id": user.id, "name": user.name, "surname": user.surname},
-              "id":service.id,"longitude":service.longitude,"latitude":service.latitude,
+             "owner": {"id": user.id, "name": user.name, "surname": user.surname},"status":service.status,
+              "id":service.id,"longitude":service.longitude,"latitude":service.latitude,"userId":service.userId,
              'date': service.date}
 
     return jsonify({'data': value, "isSuccess": 1})
@@ -68,11 +69,12 @@ def create_service(current_user):
         title=data['title'],
         description=data['description'],
         capacity=data['capacity'],
+        status=1,
         address=data['address'],
         imageUrl=data['imageUrl'],
         longitude=data['longitude'],
         latitude=data['latitude'],
-        credit=data['credit'],
+        hours=data['hours'],
         date=data['date'],
         userId=current_user.id,
         createdDate=datetime.now()
@@ -93,13 +95,28 @@ def update_service(current_user,id):
     service.title = data['title'],
     service.description = data['description'],
     service.capacity = data['capacity'],
+    service.status = data['status']
     service.address = data['address'],
     service.longitude = data['longitude'],
     service.latitude = data['latitude'],
     service.imageUrl = data['imageUrl'],
     service.date = data['date'],
-    service.credit = data['credit'],
+    service.hours = data['hours'],
     service.userId = data['userId'],
+
+    db.session.commit()
+
+    return jsonify({'message': 'New service created!', "isSuccess": 1})
+
+
+@serviceRoute.route('/service/updateStatus/<id>', methods=['POST'])
+@token_required
+def update_service_status(current_user,id):
+    data = request.get_json()
+
+    service: object = Service.query.filter_by(id=id).first()
+
+    service.status = data['status']
 
     db.session.commit()
 

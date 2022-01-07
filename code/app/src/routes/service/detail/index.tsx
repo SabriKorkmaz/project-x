@@ -18,15 +18,22 @@ import AttendeeList from "../../../components/attendee-list";
 import CheckIcon from "@mui/icons-material/Check";
 import CommentModal from "../../../components/comment-modal";
 import { ServiceService } from "../../../services/service/service.service";
+import {
+  AttendeStatusEnum,
+  MeetupAttendees,
+  StatusEnum,
+} from "../../../services/meetup/meetup.interface";
 
 const ServiceDetail = observer((props: any) => {
   const [load, setLoad] = useState(false);
   const [data, setData] = useState({} as ServiceModel);
   const [owner, setOwner] = useState(false);
 
-  const [serviceAttendees, setServiceAttendees] = useState([] as any);
+  const [serviceAttendees, setServiceAttendees] = useState(
+    [] as MeetupAttendees[]
+  );
   const { state } = useLocation();
-  const { id } = state;
+  const { id } = state || 0;
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   let navigate = useNavigate();
@@ -40,14 +47,6 @@ const ServiceDetail = observer((props: any) => {
     }
   };
 
-  let disableRequestText = () => {
-    if (requestedService().exist && requestedService().status)
-      return "Request is accepted";
-    if (requestedService().exist && !requestedService().status)
-      return "Request is waiting";
-    return "Request";
-  };
-
   let requestedService = () => {
     let result = serviceAttendees?.find(
       (k: any) => k.userId === props.user?.id
@@ -55,20 +54,25 @@ const ServiceDetail = observer((props: any) => {
     return {
       exist: result?.id !== undefined,
       status: result?.status,
+      handshakeStatus: result?.handshakeStatus,
       id: result?.id,
     };
   };
   let update = async () => {
     await getServiceAttendees(id);
+    await setServiceDetail();
     await MainStore.updateUser();
   };
 
+  let setServiceDetail = async () => {
+    let result = await ServiceService.get<ResponseModel<ServiceModel>>(id);
+    setData(result.data);
+    setLoad(true);
+  };
+
   useEffect(() => {
-    let setServiceDetail = async () => {
-      let result = await ServiceService.get<ResponseModel<ServiceModel>>(id);
-      setData(result.data);
-      setLoad(true);
-    };
+    if (!id) navigate("/");
+
     getServiceAttendees(id);
     setServiceDetail();
   }, []);
@@ -84,6 +88,74 @@ const ServiceDetail = observer((props: any) => {
     }
   }, [props.user]);
 
+  let showRequestButton = () => {
+    return props.auth && !owner && !requestedService().exist;
+  };
+
+  let datePassed = () => {
+    let currentDate = new Date();
+    let activeDate = new Date(data.date);
+
+    return currentDate > activeDate;
+  };
+
+  let showCancelRequestButton =
+    props.auth &&
+    !owner &&
+    requestedService().exist &&
+    requestedService().status === AttendeStatusEnum.Waiting;
+
+  let showHandshakeButtonForOwner =
+    props.auth && owner && data.status === StatusEnum.Pending && datePassed();
+
+  let showHandshakeButtonForAttendee =
+    props.auth &&
+    !owner &&
+    data.status === StatusEnum.Completed &&
+    requestedService().handshakeStatus === StatusEnum.Pending &&
+    datePassed();
+
+  let showCommentButton =
+    props.auth &&
+    !owner &&
+    data.status === StatusEnum.Completed &&
+    requestedService().status === AttendeStatusEnum.Approved &&
+    requestedService().handshakeStatus !== StatusEnum.Pending;
+
+  let handshakeButtonForOwnerRequest = async () => {
+    let result = await ServiceService.updateStatus({
+      id: data.id,
+      status: StatusEnum.Completed,
+    });
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
+    if (result.isSuccess) {
+      await update();
+    }
+  };
+  let handshakeButtonForAttendeeRequest = async (handshakeStatus: any) => {
+    let result = await UserService.updateRegisteredService<ResponseModel<any>>({
+      id: id,
+      status: requestedService().status,
+      handshakeStatus: handshakeStatus,
+      exchange: true,
+    });
+    if (result) {
+      setSnack({
+        message: result.message,
+        open: true,
+        type: result.isSuccess ? "success" : "error",
+      });
+    }
+    if (result.isSuccess) {
+      await update();
+    }
+  };
   let cancelRequest = async () => {
     let result = await UserService.deleteRegisteredService(
       requestedService().id
@@ -100,7 +172,7 @@ const ServiceDetail = observer((props: any) => {
     }
   };
   let handleRequest = async (id: number) => {
-    if (data.credit >= props.user.credit) {
+    if (data.hours >= props.user.credit) {
       setSnack({
         message: "You dont have enough credits",
         open: true,
@@ -112,6 +184,7 @@ const ServiceDetail = observer((props: any) => {
       {
         userId: props.user.id,
         serviceId: id,
+        hours: data.hours,
       }
     );
     if (result) {
@@ -126,21 +199,17 @@ const ServiceDetail = observer((props: any) => {
     }
   };
 
-  const acceptAction = async (id: number) => {
-    let result = await UserService.acceptRegisteredService<ResponseModel<any>>(
-      id
-    );
-    if (result) {
-      setSnack({
-        message: result.message,
-        open: true,
-        type: result.isSuccess ? "success" : "error",
-      });
-    }
-    await update();
-  };
-  const declineAction = async (id: number) => {
-    let result = await UserService.deleteRegisteredService(id);
+  const updateAction = async (
+    id: number,
+    status: AttendeStatusEnum,
+    handshakeStatus: AttendeStatusEnum
+  ) => {
+    let result = await UserService.updateRegisteredService<ResponseModel<any>>({
+      id: id,
+      status: status,
+      handshakeStatus: handshakeStatus,
+      exchange: false,
+    });
     if (result) {
       setSnack({
         message: result.message,
@@ -152,6 +221,7 @@ const ServiceDetail = observer((props: any) => {
   };
 
   const requestButton = () => {
+    if (!showRequestButton()) return;
     return (
       <Fab
         onClick={async () => {
@@ -166,11 +236,12 @@ const ServiceDetail = observer((props: any) => {
         variant="extended"
       >
         <AddIcon sx={{ mr: 1 }} />
-        {disableRequestText()}
+        Request
       </Fab>
     );
   };
   const cancelButton = () => {
+    if (!showCancelRequestButton) return;
     return (
       <Fab
         onClick={async () => {
@@ -189,11 +260,12 @@ const ServiceDetail = observer((props: any) => {
       </Fab>
     );
   };
-  const handshakeButton = () => {
+  const handshakeButtonForOwner = () => {
+    if (!showHandshakeButtonForOwner) return;
     return (
       <Fab
         onClick={async () => {
-          await cancelRequest();
+          await handshakeButtonForOwnerRequest();
         }}
         style={{
           width: "200px",
@@ -203,12 +275,31 @@ const ServiceDetail = observer((props: any) => {
         variant="extended"
       >
         <CheckIcon sx={{ mr: 1 }} />
-        Mark as completed
+        Mark as completed for owner
+      </Fab>
+    );
+  };
+  const handshakeButtonForAttendee = (status: any, text: string) => {
+    if (!showHandshakeButtonForAttendee) return;
+    return (
+      <Fab
+        onClick={async () => {
+          await handshakeButtonForAttendeeRequest(status);
+        }}
+        style={{
+          width: "200px",
+          marginTop: 20,
+          fontSize: "medium",
+        }}
+        variant="extended"
+      >
+        <CheckIcon sx={{ mr: 1 }} />
+        {text}
       </Fab>
     );
   };
   const commentButton = (data: any) => {
-    console.log(data);
+    if (!showCommentButton) return;
     return (
       <CommentModal
         type={ModalType.Service}
@@ -221,11 +312,33 @@ const ServiceDetail = observer((props: any) => {
   const attendeeList = () => {
     if (owner) {
       return (
-        <AttendeeList
-          acceptAction={acceptAction}
-          declineAction={declineAction}
-          data={serviceAttendees}
-        />
+        <AttendeeList updateAction={updateAction} data={serviceAttendees} />
+      );
+    }
+    return;
+  };
+
+  let status = (status: any) => {
+    if (status === null || status === undefined) return "";
+    if (status === AttendeStatusEnum.Waiting) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Waiting
+        </Fab>
+      );
+    }
+    if (status === AttendeStatusEnum.Approved) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Approved
+        </Fab>
+      );
+    }
+    if (status === AttendeStatusEnum.Rejected) {
+      return (
+        <Fab disabled color="secondary" aria-label="edit">
+          Rejected
+        </Fab>
       );
     }
     return;
@@ -245,29 +358,48 @@ const ServiceDetail = observer((props: any) => {
         <Divider variant="middle" style={{ margin: 0 }} />
         <HeaderImg data={data} />
         <Card style={{ minWidth: 275, display: "flex", marginBottom: 20 }}>
-          <CardContent>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              Owner:
-              <Link
-                onClick={() => {
-                  navigate("/profile/detail", { state: { id: data.owner.id } });
-                }}
-              >
-                {`${data.owner.name} ${data.owner.surname}`}
-              </Link>
-            </Typography>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              Description
-            </Typography>
-            <Typography sx={{ fontSize: 14 }} gutterBottom>
-              {data.description}
-            </Typography>
+          <CardContent
+            style={{
+              width: "100%",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                width: "100%",
+                alignItems: "center",
+              }}
+            >
+              <div>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  Owner:
+                  <Link
+                    onClick={() => {
+                      navigate("/profile/detail", {
+                        state: { id: data.owner.id },
+                      });
+                    }}
+                  >
+                    {`${data.owner.name} ${data.owner.surname}`}
+                  </Link>
+                </Typography>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  Description
+                </Typography>
+                <Typography sx={{ fontSize: 14 }} gutterBottom>
+                  {data.description}
+                </Typography>
+              </div>
+              <div>{status(requestedService().status)}</div>
+            </div>
           </CardContent>
         </Card>
         <DogTag data={data} type={ModalType.Service} />
         {requestButton()}
         {cancelButton()}
-        {handshakeButton()}
+        {handshakeButtonForOwner()}
+        {handshakeButtonForAttendee(StatusEnum.Completed, "Mark as Completed")}
         {commentButton(data)}
       </Box>
       {attendeeList()}

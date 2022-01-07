@@ -30,7 +30,6 @@ export default function CreateModal(props: CreateModalProps) {
   const { setSnack } = useContext(SnackbarContext);
   useEffect(() => {
     if (props.mode === ProcessType.Update) {
-      console.log(props.data);
       props.data.address = JSON.parse(props.data.address);
       setInput(props.data);
       setDate(props.data.date);
@@ -42,8 +41,7 @@ export default function CreateModal(props: CreateModalProps) {
   const [input, setInput] = useState({
     title: "",
     capacity: 1,
-    credit: 1,
-    duration: "",
+    hours: 1,
     description: "",
     longitude: 29.1041687,
     latitude: 41.0246477,
@@ -82,11 +80,6 @@ export default function CreateModal(props: CreateModalProps) {
       latitude: result.results[0].geometry.location.lat(),
       longitude: result.results[0].geometry.location.lng(),
     }));
-    /*   setInput((prevState) => ({
-                         ...prevState,
-                         longitude: lng.toFixed(4),
-                         latitude: lat.toFixed(4),
-                       }));*/
   };
   const setAutoComplete = async (lng: any, lat: any) => {
     let value = await geocoder.geocode({
@@ -95,7 +88,6 @@ export default function CreateModal(props: CreateModalProps) {
         lng: lng,
       },
     });
-    console.log(value);
     setValue({
       value: value.results[0],
       label: value.results[0].formatted_address,
@@ -135,7 +127,7 @@ export default function CreateModal(props: CreateModalProps) {
         type: response.isSuccess ? "success" : "error",
       });
       setInterval(() => {
-        //  window.location.reload();
+        window.location.reload();
       }, 500);
     }
   };
@@ -147,22 +139,22 @@ export default function CreateModal(props: CreateModalProps) {
           margin="normal"
           required
           fullWidth
-          value={input.credit}
+          value={input.hours}
           onChange={(e) => {
             if (e.target.value) {
               e.persist();
               setInput((prevState) => ({
                 ...prevState,
-                credit: parseInt(e.target.value),
+                hours: parseInt(e.target.value),
               }));
             }
           }}
           id="credit"
           variant="outlined"
           type="number"
-          label="Credit"
-          name="credit"
-          autoComplete="credit"
+          label="Hours"
+          name="hours"
+          autoComplete="hours"
           autoFocus
         />
       );
@@ -260,25 +252,6 @@ export default function CreateModal(props: CreateModalProps) {
             sx={{ mt: 1 }}
           >
             <TextField
-              required
-              value={input.duration}
-              onChange={(e) => {
-                e.persist();
-
-                setInput((prevState) => ({
-                  ...prevState,
-                  duration: e.target.value,
-                }));
-              }}
-              fullWidth
-              id="duration"
-              variant="outlined"
-              label="Duration"
-              name="Duration"
-              autoComplete="duration"
-            />
-
-            <TextField
               margin="normal"
               required
               fullWidth
@@ -307,7 +280,6 @@ export default function CreateModal(props: CreateModalProps) {
                 minutesStep={10}
                 renderInput={(props) => <TextField {...props} />}
                 label="Date"
-                disablePast
                 value={dateValue}
                 onChange={(newValue) => {
                   setDate(newValue as any);

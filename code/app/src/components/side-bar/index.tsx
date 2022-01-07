@@ -2,7 +2,6 @@ import ListItem from "@mui/material/ListItem";
 import { Box, Button, Card } from "@material-ui/core";
 import CssBaseline from "@mui/material/CssBaseline";
 import Avatar from "@mui/material/Avatar";
-import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { Link, useNavigate } from "react-router-dom";
 import CreateModal from "../create-modal";
 import { ModalType } from "../create-modal/modal-type.enum";
@@ -22,10 +21,7 @@ export const SideBar = observer((props: ISideBar) => {
     return;
   };
 
-  useEffect(() => {
-    console.log("user");
-    console.log(props.user);
-  }, [props.user]);
+  useEffect(() => {}, [props.user]);
   const credit = () => {
     if (MainStore.getUser()) {
       return <h6>{`Credit: ${MainStore.getUser().credit}`}</h6>;
@@ -55,10 +51,9 @@ export const SideBar = observer((props: ISideBar) => {
         >
           <Avatar
             sx={{ m: 1 }}
+            src={props.user.profileImg}
             style={{ display: "flex", justifyContent: "center" }}
-          >
-            <AccountCircleOutlinedIcon fontSize="large" />
-          </Avatar>
+          />
         </ListItem>
         <ListItem style={{ display: "flex", justifyContent: "center" }}>
           {userName()}
@@ -70,11 +65,15 @@ export const SideBar = observer((props: ISideBar) => {
           style={{ display: "flex", justifyContent: "center" }}
           alignItems="center"
         >
-          <Link to="/Profile">
-            <Button variant="outlined" size="large">
-              My Profile
-            </Button>
-          </Link>
+          <Button
+            component="button"
+            variant="outlined"
+            onClick={() => {
+              navigate("/profile/detail", { state: { id: props.user.id } });
+            }}
+          >
+            My Profile
+          </Button>
         </ListItem>
         <ListItem
           style={{ display: "flex", justifyContent: "center" }}
@@ -93,6 +92,16 @@ export const SideBar = observer((props: ISideBar) => {
           <Link to={`/profile/services?id=` + props.user.id}>
             <Button variant="outlined" size="large">
               My Services
+            </Button>
+          </Link>
+        </ListItem>
+        <ListItem
+          style={{ display: "flex", justifyContent: "center" }}
+          alignItems="center"
+        >
+          <Link to={`/profile/history?id=` + props.user.id}>
+            <Button variant="outlined" size="large">
+              History
             </Button>
           </Link>
         </ListItem>

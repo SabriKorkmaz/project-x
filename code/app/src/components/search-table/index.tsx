@@ -19,7 +19,6 @@ export default function SearchTable(props: ITableList) {
   let bannedTitles = ["userId", "address", "description", "id", "type"];
   useEffect(() => {
     if (props.data) {
-      console.log(props.data);
       setData(props.data.data);
 
       setTitles(
