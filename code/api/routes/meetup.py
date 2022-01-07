@@ -32,6 +32,29 @@ def get_latest():
     return jsonify({'data': data, "isSuccess": 1})
 
 
+@meetupRoute.route('/meetup/getMeetups', methods=['POST'])
+@token_required
+def get_meetups(current_user):
+    print(id)
+    meetups = Meetup.query.all()
+
+    data = []
+
+    for meetup in meetups:
+        value = {'imageUrl': meetup.imageUrl,
+                 'title': meetup.title,"description":meetup.description,
+                 'address': meetup.address,
+                 "longitude": meetup.longitude,
+                 "status": meetup.status,
+                 "latitude": meetup.latitude,
+                 'userId': meetup.userId,
+                 'capacity': meetup.capacity,"id": meetup.id,
+                 'date': meetup.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})
+
+
 @meetupRoute.route('/meetup/getAll/<id>', methods=['GET'])
 @token_required
 def get_all_meetups(current_user, id):
@@ -52,6 +75,8 @@ def get_all_meetups(current_user, id):
         data.append(value)
 
     return jsonify({'data': data, "isSuccess": 1})
+
+
 
 
 @meetupRoute.route('/meetup/get/<id>', methods=['GET'])

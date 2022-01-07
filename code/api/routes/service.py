@@ -44,6 +44,23 @@ def get_all_services(current_user, id):
     return jsonify({'data': data, "isSuccess": 1})
 
 
+@serviceRoute.route('/service/getServices', methods=['POST'])
+@token_required
+def get_services(current_user):
+    services = Service.query.all()
+    data = []
+
+    for service in services:
+        value = {'title': service.title, 'description': service.description,
+                 "hours": service.hours,"userId": service.userId,"status":service.status,
+                 'capacity': service.capacity, 'address': service.address, 'imageUrl': service.imageUrl,
+                 "id": service.id,"longitude":service.longitude,"latitude":service.latitude,
+                 'date': service.date}
+        data.append(value)
+
+    return jsonify({'data': data, "isSuccess": 1})
+
+
 @serviceRoute.route('/service/get/<id>', methods=['GET'])
 def get_one_service(id):
     service = Service.query.filter_by(id=id).first()
