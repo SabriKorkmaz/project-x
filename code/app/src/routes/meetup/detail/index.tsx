@@ -33,7 +33,7 @@ const MeetupDetail = observer((props: any) => {
     [] as MeetupAttendees[]
   );
   const { state } = useLocation();
-  const { id } = state || 0;
+  const { id } = state;
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   let navigate = useNavigate();
