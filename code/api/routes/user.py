@@ -395,7 +395,7 @@ def get_service_attendees(current_user,id):
                      "id": userservice.id,
                      "handshakeStatus": userservice.handshakeStatus,
                      "name": userservice.user.name,
-                     "surname": userservice.user.name,
+                     "surname": userservice.user.surname,
                      'serviceId': userservice.serviceId}
             data.append(value)
 
@@ -411,7 +411,7 @@ def update_service(current_user):
 
     userservice.status = data["status"]
     userservice.handshakeStatus = data["handshakeStatus"]
-
+    db.session.commit()
     if data["exchange"]:
         service = Service.query.filter_by(id=userservice.serviceId).first()
         user = User.query.filter_by(id=service.userId).first()
