@@ -377,7 +377,7 @@ const MeetupDetail = observer((props: any) => {
             </div>
           </CardContent>
         </Card>
-        <DogTag data={data} type={ModalType.Service} />
+        <DogTag data={data} type={ModalType.Meetup} />
         {requestButton()}
         {cancelButton()}
         {handshakeButtonForOwner()}

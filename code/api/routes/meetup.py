@@ -149,6 +149,8 @@ def update_meetup(current_user,id):
     meetup.address = data['address'],
     meetup.status = data['status'],
     meetup.imageUrl = data['imageUrl'],
+    meetup.longitude = data['longitude']
+    meetup.latitude = data['latitude']
     meetup.date = data['date'],
 
     db.session.commit()
