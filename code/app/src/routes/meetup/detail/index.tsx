@@ -137,7 +137,7 @@ const MeetupDetail = observer((props: any) => {
   };
   let handshakeButtonForAttendeeRequest = async (handshakeStatus: any) => {
     let result = await UserService.updateRegisteredMeetup<ResponseModel<any>>({
-      id: id,
+      id: requestedMeetup().id,
       status: requestedMeetup().status,
       handshakeStatus: handshakeStatus,
     });

@@ -10,8 +10,10 @@ import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import Button from "@mui/material/Button";
 import { AttendeStatusEnum } from "../../services/service/service.interface";
+import { useNavigate } from "react-router-dom";
 
 const AttendeeList = (props: any) => {
+  let navigate = useNavigate();
   const actionButtons = (row: any) => {
     return (
       <React.Fragment>
@@ -62,7 +64,7 @@ const AttendeeList = (props: any) => {
         <Table style={{ minWidth: 650 }} aria-label="simple table">
           <TableHead>
             <TableRow>
-              <TableCell>UserId</TableCell>
+              <TableCell>Profile</TableCell>
               <TableCell align="right">Name</TableCell>
               <TableCell align="right">Surname</TableCell>
               <TableCell align="right">Status</TableCell>
@@ -74,7 +76,15 @@ const AttendeeList = (props: any) => {
             {data.map((row: any) => (
               <TableRow>
                 <TableCell component="th" scope="row">
-                  {row.userId}
+                  <Button
+                    component="button"
+                    variant="outlined"
+                    onClick={() => {
+                      navigate("/profile/detail", { state: { id: row.id } });
+                    }}
+                  >
+                    Profile
+                  </Button>
                 </TableCell>
                 <TableCell align="right">{row.name}</TableCell>
                 <TableCell align="right">{row.surname}</TableCell>

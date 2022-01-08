@@ -95,7 +95,7 @@ const ServiceDetail = observer((props: any) => {
   let datePassed = () => {
     let currentDate = new Date();
     let activeDate = new Date(data.date);
-
+    activeDate.setHours(activeDate.getHours() + data.hours);
     return currentDate > activeDate;
   };
 
@@ -140,7 +140,7 @@ const ServiceDetail = observer((props: any) => {
   };
   let handshakeButtonForAttendeeRequest = async (handshakeStatus: any) => {
     let result = await UserService.updateRegisteredService<ResponseModel<any>>({
-      id: id,
+      id: requestedService().status,
       status: requestedService().status,
       handshakeStatus: handshakeStatus,
       exchange: true,
