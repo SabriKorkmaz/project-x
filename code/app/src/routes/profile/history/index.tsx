@@ -55,12 +55,9 @@ const HistoryDetail = (props: any) => {
             title: title,
             data: data,
           } as ITable;
-
           setServices(tableData);
         }
-
         let meetupIds = result.data.meetups.map((k: any) => k.serviceId);
-
         let meetups = await MeetupService.getMeetups(meetupIds);
         if (result.data.meetups.length) {
           let title = Object.keys(result.data.meetups[0]).filter(
