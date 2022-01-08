@@ -469,10 +469,10 @@ def advancedSearch():
                                         " )"
                                         ") AS distance "
                                         "FROM ProjectX.service "
-                                        "where ProjectX.service.title like '%' :keyword '%' "
+                                        "where ProjectX.service.title like :keyword "
                                         "Having distance < :distance "
                                         "ORDER BY distance "
-                                        "LIMIT 0 , 20 ", { "keyword": data["keyword"],"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
+                                        "LIMIT 0 , 20 ", { "keyword":'%' + data["keyword"] + '%' ,"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
         ).fetchall()
 
         for row in services:
@@ -490,10 +490,10 @@ def advancedSearch():
             " )"
             ") AS distance "
             "FROM ProjectX.meetup "
-            "where ProjectX.meetup.title like '%':keyword'%' "
+            "where ProjectX.meetup.title like :keyword "
             "Having distance < :distance "
             "ORDER BY distance "
-            "LIMIT 0 , 20 ", { "keyword": data["keyword"],"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
+            "LIMIT 0 , 20 ", { "keyword":'%' + data["keyword"] + '%',"distance":data["distance"],"lat":data["latitude"],"lng":data["longitude"]}
 
         ).fetchall()
         print(meetups)
