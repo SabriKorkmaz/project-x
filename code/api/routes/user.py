@@ -320,8 +320,9 @@ def update_user(current_user,id):
     user.description = data["description"]
     user.email = data["email"]
     user.profileImg = data["profileImg"]
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    user.password = hashed_password
+    if data['password'] != "":
+        hashed_password = generate_password_hash(data['password'], method='sha256')
+        user.password = hashed_password
 
     db.session.commit()
 
