@@ -51,6 +51,7 @@ const ServiceDetail = observer((props: any) => {
     let result = serviceAttendees?.find(
       (k: any) => k.userId === props.user?.id
     );
+    console.log(result);
     return {
       exist: result?.id !== undefined,
       status: result?.status,
@@ -96,6 +97,7 @@ const ServiceDetail = observer((props: any) => {
     let currentDate = new Date();
     let activeDate = new Date(data.date);
     activeDate.setHours(activeDate.getHours() + data.hours);
+    console.log(currentDate > activeDate);
     return currentDate > activeDate;
   };
 
@@ -310,6 +312,7 @@ const ServiceDetail = observer((props: any) => {
   };
 
   const attendeeList = () => {
+    console.log(serviceAttendees);
     if (owner) {
       return (
         <AttendeeList updateAction={updateAction} data={serviceAttendees} />
