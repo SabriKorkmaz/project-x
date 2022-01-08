@@ -84,7 +84,7 @@ export default function CreateModal(props: CreateModalProps) {
   const setAutoComplete = async (lng: any, lat: any) => {
     let value = await geocoder.geocode({
       location: {
-        lat: parseInt(lat),
+        lat: lat,
         lng: lng,
       },
     });
