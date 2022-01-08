@@ -275,7 +275,7 @@ const ServiceDetail = observer((props: any) => {
         variant="extended"
       >
         <CheckIcon sx={{ mr: 1 }} />
-        Mark as completed for owner
+        Mark as completed
       </Fab>
     );
   };
