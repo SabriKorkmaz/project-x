@@ -19,6 +19,7 @@ import MainStore from "../../stores/index";
 import { GoogleMaps } from "../google-maps";
 
 import GooglePlacesAutocomplete from "react-google-places-autocomplete";
+import { ValidationMapper } from "../../utils/validation.mapper";
 
 export default function CreateModal(props: CreateModalProps) {
   let ModalNameUpdate = props.mode == ProcessType.Create ? "Create" : "Edit";
@@ -98,15 +99,11 @@ export default function CreateModal(props: CreateModalProps) {
     let isValid = true;
     let date = new Date(new Date(dateValue).setSeconds(0)).toLocaleString();
     let result = { ...input, date, imageUrl, address };
-    Object.keys(result).forEach((key) => {
-      if (key !== "id" && (result[key] === "" || result[key] === 0)) {
-        isValid = false;
-      }
-    });
+    isValid = ValidationMapper.keyValidation(result);
 
     if (!isValid) {
       setSnack({
-        message: "Form alanları boş geçilemez",
+        message: "All field are required",
         open: true,
         type: "error",
       });

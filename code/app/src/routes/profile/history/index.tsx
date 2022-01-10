@@ -5,9 +5,9 @@ import TableList from "../../../components/table";
 import { ModalType } from "../../../components/create-modal/modal-type.enum";
 import { useNavigate } from "react-router-dom";
 import { ITable } from "../../../components/table/interface";
-import { AttendeStatusEnum } from "../../../services/meetup/meetup.interface";
 import { MeetupService } from "../../../services/meetup/meetup.service";
 import { ServiceService } from "../../../services/service/service.service";
+import { ObjectMapper } from "../../../utils/object.mapper";
 
 const HistoryDetail = (props: any) => {
   let bannedTitles = [
@@ -36,19 +36,10 @@ const HistoryDetail = (props: any) => {
           let title = Object.keys(result.data.services[0]).filter(
             (k: any) => !bannedTitles.includes(k)
           );
-          let data = result.data.services?.map((k: any) => {
-            k.id = k.serviceId;
-            k.title = services?.data?.find(
-              (s: any) => s.id == k.serviceId
-            )?.title;
-            k.process =
-              k.status == AttendeStatusEnum.Waiting
-                ? "Waiting"
-                : k.status == AttendeStatusEnum.Approved
-                ? "Approved"
-                : "Rejected";
-            return k;
-          });
+          let data = ObjectMapper.mapToHistoryTableToService(
+            result.data,
+            services
+          );
           title.push("process");
           title.push("title");
           let tableData = {
@@ -65,18 +56,10 @@ const HistoryDetail = (props: any) => {
           );
           title.push("process");
           title.push("title");
-          let data = result.data.meetups?.map((k: any) => {
-            return {
-              id: k.meetupId,
-              title: meetups?.data?.find((s: any) => s.id == k.meetupId)?.title,
-              process:
-                k.status == AttendeStatusEnum.Waiting
-                  ? "Waiting"
-                  : k.status == AttendeStatusEnum.Approved
-                  ? "Approved"
-                  : "Rejected",
-            };
-          });
+          let data = ObjectMapper.mapToHistoryTableToMeetup(
+            result.data,
+            meetups
+          );
           let tableData2 = {
             title: title,
             data: data,

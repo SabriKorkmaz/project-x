@@ -8,6 +8,7 @@ import Container from "@mui/material/Container";
 import { useContext, useState } from "react";
 import { UserService } from "../../services/user/user.service";
 import { SnackbarContext } from "../../index";
+import { ValidationMapper } from "../../utils/validation.mapper";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -17,13 +18,32 @@ export default function Register() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
+
   const handleSubmit = async () => {
-    let result = await UserService.create({
+    if (password !== passwordConfirm) {
+      setSnack({
+        message: "Passwords are not the same",
+        open: true,
+        type: "error",
+      });
+      return;
+    }
+    let user = {
       name: name,
       surname: surname,
       email: email,
       password: password,
-    });
+    };
+    let isValid = ValidationMapper.keyValidation(user);
+    if (!isValid) {
+      setSnack({
+        message: "All fields are required",
+        open: true,
+        type: "error",
+      });
+      return;
+    }
+    let result = await UserService.create(user);
 
     setSnack({
       message: result.message,
