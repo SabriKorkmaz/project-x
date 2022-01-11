@@ -6,8 +6,8 @@ export abstract class ObjectMapper {
   static mapToHistoryTableToService(data: any, source: any): any {
     return data.services?.map((k: any) => {
       return {
-        id: k.meetupId,
-        title: source?.data?.find((s: any) => s.id == k.meetupId)?.title,
+        id: k.serviceId,
+        title: source?.data?.find((s: any) => s.id == k.serviceId)?.title,
         process:
           k.status == AttendeStatusEnum.Waiting
             ? "Waiting"
