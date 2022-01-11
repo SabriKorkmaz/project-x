@@ -11,6 +11,7 @@ First, we run our frontend application.
 The following line of code can be used to download and install our frontend application from DockerHub.
 
 docker pull sbrkrkmz/project-x:project-x-frontend
+<br>
 docker run -dp 8080:80 --name project-x-ui sbrkrkmz/project-x:project-x-frontend
 
 After this process, our frontend application is now working, but without our backend application, it does not provide any functionality.
