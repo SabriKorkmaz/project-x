@@ -24,10 +24,11 @@ sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-
 
 After downloading the docker-compose file in the link below and going to the folder it is in, we run our backend application with a single piece of command line code.
 
-docker-compose up -d
 
-Docker-compose link : 
+Docker-compose file link : 
 https://github.com/SabriKorkmaz/project-x/blob/main/code/api/docker-compose.yml
+
+docker-compose up -d
 
 After completing all these steps, we can access our application with http://localhost:8080
 
