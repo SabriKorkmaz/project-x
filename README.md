@@ -30,5 +30,4 @@ https://github.com/SabriKorkmaz/project-x/blob/main/code/api/docker-compose.yml
 
 After completing all these steps, we can access our application with http://localhost:8080
 
-![image](https://user-images.githubusercontent.com/8656320/148959553-b9058883-4dfa-4d92-8461-3ab980bb2fdb.png)
 
