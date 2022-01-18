@@ -33,5 +33,6 @@ export interface MeetupAttendees extends BaseModel {
   userId: number;
   createdDate: string;
   hours: number;
+  serviceId: number;
   handshakeStatus: StatusEnum;
 }

@@ -15,6 +15,7 @@ export interface ServiceModel extends BaseModel {
   latitude: string;
   owner: Partial<UserModel>;
   status: StatusEnum | string;
+  tag: string;
 }
 
 export enum AttendeStatusEnum {

@@ -80,7 +80,9 @@ const AttendeeList = (props: any) => {
                     component="button"
                     variant="outlined"
                     onClick={() => {
-                      navigate("/profile/detail", { state: { id: row.id } });
+                      navigate("/profile/detail", {
+                        state: { id: row.userId },
+                      });
                     }}
                   >
                     Profile

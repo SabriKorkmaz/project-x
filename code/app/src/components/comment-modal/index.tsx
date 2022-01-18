@@ -61,6 +61,7 @@ export default function CommentModal(props: IModal) {
         open: true,
         type: result.isSuccess ? "success" : "error",
       });
+      handleClose();
     }
   };
   return (

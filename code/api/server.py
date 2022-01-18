@@ -16,6 +16,7 @@ CORS(app)
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root@localhost/ProjectX'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@db/ProjectX'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['PROPAGATE_EXCEPTIONS'] = True
 app.register_blueprint(userRoute)
 app.register_blueprint(meetupRoute)
 app.register_blueprint(serviceRoute)

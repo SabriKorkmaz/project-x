@@ -57,6 +57,7 @@ const ServiceDetail = observer((props: any) => {
       status: result?.status,
       handshakeStatus: result?.handshakeStatus,
       id: result?.id,
+      serviceId: result?.serviceId,
     };
   };
   let update = async () => {
@@ -142,7 +143,7 @@ const ServiceDetail = observer((props: any) => {
   };
   let handshakeButtonForAttendeeRequest = async (handshakeStatus: any) => {
     let result = await UserService.updateRegisteredService<ResponseModel<any>>({
-      id: requestedService().status,
+      id: requestedService().id,
       status: requestedService().status,
       handshakeStatus: handshakeStatus,
       exchange: true,

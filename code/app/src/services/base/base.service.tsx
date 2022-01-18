@@ -102,6 +102,24 @@ export abstract class BaseService {
     }
   }
 
+  static async getTag(tag: string): Promise<ReturnType<any>> {
+    try {
+      console.log(tag);
+      const endpoint =
+        `https://en.wikipedia.org/w/api.php?action=query&prop=extracts&utf8=&exintro&explaintext&redirects=1&format=json&origin=*&=20&titles=` +
+        tag;
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw Error(response.statusText);
+      }
+      const json = await response.json();
+      return json;
+    } catch (error: any) {
+      console.log("error:", error);
+      return error.data;
+    }
+  }
+
   static async login(request: LoginModel): Promise<ResponseModel<string>> {
     try {
       await this.initAxios();

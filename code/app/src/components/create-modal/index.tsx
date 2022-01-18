@@ -27,6 +27,7 @@ export default function CreateModal(props: CreateModalProps) {
     props.type === ModalType.Service ? "Service" : "Meetup"
   }`;
   const [value, setValue] = useState(null as any);
+  //  const [tagInfo, setTagInfo] = useState("");
   // @ts-ignore
   const { setSnack } = useContext(SnackbarContext);
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function CreateModal(props: CreateModalProps) {
   const [input, setInput] = useState({
     title: "",
     capacity: 1,
+    tag: "test",
     hours: 1,
     description: "",
     longitude: 29.1041687,
@@ -56,6 +58,19 @@ export default function CreateModal(props: CreateModalProps) {
   const onFileChange = (event: any) => {
     setFile(event.target.files[0]);
   };
+
+  /*  const getMoreInfo = async () => {
+        let response = await BaseService.getTag(input.tag);
+        console.log(response);
+        let keys = Object.keys(response?.query?.pages);
+        if (keys.length > 0) {
+          let pageId = keys[0];
+          let info = response?.query?.pages[pageId];
+          if (info != null) {
+            setTagInfo(info.extract);
+          }
+        }
+      };*/
   const uploadImage = async () => {
     const formData = new FormData();
     formData.append("file", file as any, file.name);
@@ -189,6 +204,7 @@ export default function CreateModal(props: CreateModalProps) {
               id="title"
               autoComplete="title"
             />
+
             <GooglePlacesAutocomplete
               selectProps={{
                 value,
@@ -242,6 +258,7 @@ export default function CreateModal(props: CreateModalProps) {
               autoComplete="description"
             />
           </Box>
+
           <Box
             style={{ flexGrow: 20 }}
             component="form"
@@ -303,6 +320,37 @@ export default function CreateModal(props: CreateModalProps) {
               </Button>
             </InputLabel>
             <img width={"300px"} src={imageUrl} />
+
+            {/* <TextField
+              margin="normal"
+              required
+              value={input.tag}
+              onChange={(e) => {
+                e.persist();
+
+                setInput((prevState) => ({
+                  ...prevState,
+                  tag: e.target.value,
+                }));
+              }}
+              fullWidth
+              variant="outlined"
+              name="tag"
+              label="tag"
+              id="tag"
+              autoComplete="tag"
+            />
+            <Button
+              onClick={() => {
+                getMoreInfo();
+              }}
+              variant="outlined"
+              size="large"
+            >
+              get more info
+            </Button>
+            <div style={{ maxWidth: "200px" }}>{tagInfo}</div>
+          */}
           </Box>
         </Container>
         <Button
